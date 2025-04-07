@@ -7,8 +7,8 @@ const userSchema = new mongoose.Schema({
     role: {type: String, enum: ['customer', 'restaurant', 'administrator'], required: true},
     firstName: {type: String, required: true},
     lastName: {type: String, required: true},
-    createdDate: {type: Date, default: Date.now}
-})
+},
+{timestamps: true})
 
 userSchema.pre('save', async function(next){
     const salt = await bcrypt.genSalt()

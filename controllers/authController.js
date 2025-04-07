@@ -1,5 +1,6 @@
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 
 let authController = {}
 
@@ -24,8 +25,32 @@ authController.signup = async function(req, res){
 
 }
 
-authController.login = function(req, res){
-    res.send('login')
+authController.login = async function(req, res){
+    const {username, password} = req.body
+
+    try{
+        const user = await User.findOne({username})
+
+        if(!user){
+            return res.status(401).json({message: 'Username or password is invalid.'})
+        }
+
+        const passwordMatched = await bcrypt.compare(password, user.password)
+
+        if(!passwordMatched){
+            return res.status(401).json({message: 'Username or password is invalid.'})
+        }
+
+        const accessToken = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '2d'}) 
+
+        return res.status(200).json({
+            id: user._id,
+            name: user.username,
+            accessToken: accessToken
+        })
+    } catch(err){
+        return res.status(400).json({message: err.message})
+    }
 }
 
 module.exports = authController
