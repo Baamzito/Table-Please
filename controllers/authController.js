@@ -1,4 +1,5 @@
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 let authController = {}
 
@@ -20,7 +21,6 @@ authController.signup = async function(req, res){
     } catch(err){
         res.status(400).send('Error: User was not created!')
     }
-
 
 }
 
