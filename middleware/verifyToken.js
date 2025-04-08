@@ -10,8 +10,8 @@ async function verifyToken(req, res, next){
     const accessToken = authHeader.split(' ')[1]
 
     try{
-        const decodedAccessToken = jwt.verify(accessToken, process.env.JWT_SECRET)
-        req.user = decodedAccessToken
+        const payload = jwt.verify(accessToken, process.env.JWT_SECRET)
+        req.user = payload
         next()
     } catch(err){
         return res.status(401).json({message: 'Access token invalid or expired'})

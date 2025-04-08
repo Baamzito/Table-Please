@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt')
 let authController = {}
 
 authController.showSignup = function(req, res){
-    
     res.render('signup')
 }
 
@@ -15,6 +14,8 @@ authController.showLogin = function(req, res){
 
 authController.signup = async function(req, res){
     const {username, password, role, firstName, lastName} = req.body;
+
+    if(username)
 
     try{
         const user = await User.create({username, password, role, firstName, lastName})
@@ -41,7 +42,7 @@ authController.login = async function(req, res){
             return res.status(401).json({message: 'Username or password is invalid.'})
         }
 
-        const accessToken = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '2d'}) 
+        const accessToken = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1h'}) 
 
         return res.status(200).json({
             id: user._id,
