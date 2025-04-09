@@ -4,10 +4,160 @@
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   </head>
   <body>
     <%- include('partials/navbar') %>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+    <section class="hero-section py-5 bg-light">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-8 text-center">
+            <h1 class="display-4 fw-bold mb-3">Peça comida dos melhores restaurantes</h1>
+            <p class="lead mb-4">Descubra restaurantes locais, faça seus pedidos e receba sua comida favorita sem sair de casa</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Restaurantes em destaque -->
+    <section class="featured-restaurants py-5 bg-light">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="mb-0">Restaurantes em Destaque</h2>
+          <a href="/restaurants" class="text-decoration-none">Ver todos <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+        
+        <div class="row g-4">
+          <!-- Restaurante 1 -->
+          <div class="col-md-6 col-lg-4">
+            <div class="card restaurant-card h-100">
+              <div class="position-relative">
+                <img src="/images/restaurants/pizza-place.jpg" class="card-img-top" alt="Pizza Place">
+                <span class="badge bg-success position-absolute top-0 end-0 m-2">Aberto</span>
+              </div>
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h5 class="card-title mb-0">Pizza Delícia</h5>
+                  <span class="badge bg-light text-dark">
+                    <i class="fas fa-star text-warning"></i> 4.8
+                  </span>
+                </div>
+                <p class="card-text text-muted small">
+                  <i class="fas fa-map-marker-alt me-1"></i> 2.5 km de distância
+                </p>
+                <p class="card-text">Pizzas artesanais com ingredientes frescos e massa crocante.</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="text-muted small">
+                    <i class="far fa-clock me-1"></i> 30-45 min
+                  </span>
+                  <span class="text-muted small">
+                    <i class="fas fa-motorcycle me-1"></i> €2.99 entrega
+                  </span>
+                </div>
+              </div>
+              <a href="/restaurant/pizza-delicia" class="stretched-link"></a>
+            </div>
+          </div>
+          
+          <!-- Restaurante 2 -->
+          <div class="col-md-6 col-lg-4">
+            <div class="card restaurant-card h-100">
+              <div class="position-relative">
+                <img src="/images/restaurants/sushi-house.jpg" class="card-img-top" alt="Sushi House">
+                <span class="badge bg-success position-absolute top-0 end-0 m-2">Aberto</span>
+              </div>
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h5 class="card-title mb-0">Sushi Express</h5>
+                  <span class="badge bg-light text-dark">
+                    <i class="fas fa-star text-warning"></i> 4.6
+                  </span>
+                </div>
+                <p class="card-text text-muted small">
+                  <i class="fas fa-map-marker-alt me-1"></i> 3.2 km de distância
+                </p>
+                <p class="card-text">O melhor sushi da cidade com ingredientes frescos do mar.</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="text-muted small">
+                    <i class="far fa-clock me-1"></i> 40-55 min
+                  </span>
+                  <span class="text-muted small">
+                    <i class="fas fa-motorcycle me-1"></i> €3.50 entrega
+                  </span>
+                </div>
+              </div>
+              <a href="/restaurant/sushi-express" class="stretched-link"></a>
+            </div>
+          </div>
+          
+          <!-- Restaurante 3 -->
+          <div class="col-md-6 col-lg-4">
+            <div class="card restaurant-card h-100">
+              <div class="position-relative">
+                <img src="/images/restaurants/burger-joint.jpg" class="card-img-top" alt="Burger Joint">
+                <span class="badge bg-success position-absolute top-0 end-0 m-2">Aberto</span>
+              </div>
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h5 class="card-title mb-0">Burger Gourmet</h5>
+                  <span class="badge bg-light text-dark">
+                    <i class="fas fa-star text-warning"></i> 4.7
+                  </span>
+                </div>
+                <p class="card-text text-muted small">
+                  <i class="fas fa-map-marker-alt me-1"></i> 1.8 km de distância
+                </p>
+                <p class="card-text">Hambúrgueres artesanais com carnes nobres e acompanhamentos especiais.</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="text-muted small">
+                    <i class="far fa-clock me-1"></i> 25-40 min
+                  </span>
+                  <span class="text-muted small">
+                    <i class="fas fa-motorcycle me-1"></i> €2.50 entrega
+                  </span>
+                </div>
+              </div>
+              <a href="/restaurant/burger-gourmet" class="stretched-link"></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Como funciona -->
+    <section class="how-it-works py-5">
+      <div class="container">
+        <h2 class="text-center mb-5">Como Funciona</h2>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="text-center">
+              <div class="step-icon mb-3">
+                <i class="fas fa-search fa-3x text-primary"></i>
+              </div>
+              <h4>1. Encontre</h4>
+              <p class="text-muted">Pesquise restaurantes por localização, tipo de comida ou nome</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-center">
+              <div class="step-icon mb-3">
+                <i class="fas fa-utensils fa-3x text-primary"></i>
+              </div>
+              <h4>2. Escolha</h4>
+              <p class="text-muted">Navegue pelo cardápio e selecione seus pratos favoritos</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-center">
+              <div class="step-icon mb-3">
+                <i class="fas fa-truck fa-3x text-primary"></i>
+              </div>
+              <h4>3. Receba</h4>
+              <p class="text-muted">Faça seu pedido e acompanhe a entrega em tempo real</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-LePMBEqKVJS3yRZEKPNtX4U4l7H27W3QOU5/+3fW1pC3sG8KJYGt5PqAXqKklY0A" crossorigin="anonymous"></script>
+    <script src="/javascripts/main.js"></script>
   </body>
 </html>
