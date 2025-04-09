@@ -82,7 +82,7 @@ authController.logout = function(req, res) {
         sameSite: 'strict',
     });
 
-    res.redirect('/');
+    res.redirect('/auth/login');
 }
 
 module.exports = authController
