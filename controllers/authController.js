@@ -15,7 +15,21 @@ authController.showLogin = function(req, res){
 authController.signup = async function(req, res){
     const {username, password, role, firstName, lastName} = req.body;
 
-    if(username)
+    if (!username || typeof username !== 'string' || username.trim().length < 5) {
+        return res.status(400).json({ error: 'Username is required and must be at least 5 characters long.' });
+    }
+
+    if (!password || typeof password !== 'string' || password.length < 5) {
+        return res.status(400).json({ error: 'Password is required and must be at least 5 characters long.' });
+    }
+
+    if (!firstName || typeof firstName !== 'string' || firstName.trim() === '') {
+        return res.status(400).json({ error: 'First name is required and must be a non-empty string.' });
+    }
+
+    if (!lastName || typeof lastName !== 'string' || lastName.trim() === '') {
+        return res.status(400).json({ error: 'Last name is required and must be a non-empty string.' });
+    }
 
     try{
         const user = await User.create({username, password, role, firstName, lastName})
@@ -28,6 +42,10 @@ authController.signup = async function(req, res){
 
 authController.login = async function(req, res){
     const {username, password} = req.body
+
+    if (!username || !password) {
+        return res.status(400).json({message: 'Username and password are required'})
+    }
 
     try{
         const user = await User.findOne({username})
@@ -42,16 +60,29 @@ authController.login = async function(req, res){
             return res.status(401).json({message: 'Username or password is invalid.'})
         }
 
-        const accessToken = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1h'}) 
+        const accessToken = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '7d'}) 
 
-        return res.status(200).json({
-            id: user._id,
-            name: user.username,
-            accessToken: accessToken
-        })
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            maxAge: 604800000 // 7 dias
+        });
+
+        res.locals.isAuthenticated = true
+        
+        return res.redirect('/')
     } catch(err){
         return res.status(400).json({message: err.message})
     }
+}
+
+authController.logout = function(req, res) {
+    res.clearCookie('accessToken', {
+        httpOnly: true,
+        sameSite: 'strict',
+    });
+
+    res.redirect('/');
 }
 
 module.exports = authController
