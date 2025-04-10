@@ -5,11 +5,11 @@ const bcrypt = require('bcrypt')
 let authController = {}
 
 authController.showSignup = function(req, res){
-    res.render('signup')
+    res.render('auth/signup')
 }
 
 authController.showLogin = function(req, res){
-    res.render('login')
+    res.render('auth/login')
 }
 
 authController.signup = async function(req, res){
