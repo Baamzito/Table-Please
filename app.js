@@ -6,9 +6,11 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
+const authMiddleware = require('./middleware/authMiddleware');
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/authRoutes');
 const restaurantsRouter = require('./routes/restaurantRoutes');
+const profileRouter = require('./routes/profileRoutes');
 
 const app = express();
 
@@ -30,9 +32,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(authMiddleware);
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/restaurants', restaurantsRouter);
+app.use('/profile', profileRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

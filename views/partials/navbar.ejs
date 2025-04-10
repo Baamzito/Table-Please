@@ -32,18 +32,15 @@
               <span><%= user.name %></span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
-              <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2 text-primary"></i>Meu Perfil</a></li>
-              <li><a class="dropdown-item" href="/my-reservations"><i class="fas fa-calendar-check me-2 text-primary"></i>Minhas Reservas</a></li>
-              <li><a class="dropdown-item" href="/favorites"><i class="fas fa-heart me-2 text-primary"></i>Favoritos</a></li>
+              <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2 text-primary"></i>My Profile</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2 text-primary"></i>Sair</a></li>
+              <li><a class="dropdown-item" href="/auth/logout"><i class="fas fa-sign-out-alt me-2 text-primary"></i>Logout</a></li>
             </ul>
           </div>
         <% } else { %>
           <!-- Usuário não logado -->
           <a href="/auth/login" class="btn btn-outline-primary me-2">Login</a>
           <a href="/auth/signup" class="btn btn-primary me-2">Sign up</a>
-          <a href="/auth/logout" class="btn btn-primary">Logout</a>
         <% } %>
       </div>
     </div>
