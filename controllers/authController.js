@@ -60,7 +60,7 @@ authController.login = async function(req, res){
             return res.status(401).json({message: 'Username or password is invalid.'})
         }
 
-        const accessToken = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '7d'}) 
+        const accessToken = jwt.sign({id: user._id, username: user.username, role: user.role}, process.env.JWT_SECRET, {expiresIn: '7d'}) 
 
         res.cookie('accessToken', accessToken, {
             httpOnly: true,

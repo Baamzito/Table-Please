@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 76px;
+            padding: 0;
+        }
+        .restaurant-header {
+            background-size: cover;
+            background-position: center;
+            height: 350px;
+            position: relative;
+        }
+        .restaurant-header-overlay {
+            background: rgba(0,0,0,0.5);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .restaurant-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .menu-item-img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .review-avatar {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+        }
+        .sticky-sidebar {
+            position: sticky;
+            top: 100px;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .nav-pills .nav-link {
+            color: #495057;
+        }
+        .menu-category {
+            scroll-margin-top: 100px;
+        }
+        .review-rating {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+    
+    <!-- Restaurant Header -->
+    <section class="restaurant-header w-100" style="background-image: url('/images/restaurant-default.jpg');">
+        <div class="restaurant-header-overlay d-flex align-items-end">
+            <div class="container py-5">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <h1 class="text-white display-4 fw-bold"><%= restaurant.name %></h1>
+                        <div class="d-flex flex-wrap align-items-center">
+                            <% if(restaurant.rating) { %>
+                                <div class="bg-primary text-white px-3 py-1 rounded-pill me-3 mb-2">
+                                    <i class="fas fa-star me-1"></i><%= typeof restaurant.rating === 'number' ? restaurant.rating.toFixed(1) : restaurant.rating %>
+                                </div>
+                            <% } %>
+                            <% if(restaurant.cuisine) { %>
+                                <span class="badge bg-light text-dark me-3 mb-2">
+                                    <i class="fas fa-utensils me-1"></i><%= restaurant.cuisine %>
+                                </span>
+                            <% } %>
+                            <% if(restaurant.priceRange) { %>
+                                <span class="badge bg-light text-dark me-3 mb-2">
+                                <% for(let i = 0; i < restaurant.priceRange; i++) { %>
+                                    <i class="fas fa-dollar-sign"></i>
+                                <% } %>
+                                </span>
+                            <% } %>
+                        </div>
+                        <p class="text-white mb-0">
+                            <i class="fas fa-map-marker-alt me-2"></i><%= restaurant.address || restaurant.location || 'Address not available' %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Left Side Column - Content -->
+                <div class="col-lg-8">
+                    <!-- Navigation Pills -->
+                    <ul class="nav nav-pills mb-4">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#overview">Overview</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#menu">Menu</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#reviews">Reviews</a>
+                        </li>
+                    </ul>
+
+                    <!-- Overview Section -->
+                    <section id="overview" class="mb-5">
+                        <h2 class="mb-4">About <%= restaurant.name %></h2>
+                        <% if(restaurant.description) { %>
+                            <p><%= restaurant.description %></p>
+                        <% } else { %>
+                            <p>No description available for this restaurant.</p>
+                        <% } %>
+
+                        <!-- Features -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <h5 class="mb-3">Features</h5>
+                                <ul class="list-unstyled">
+                                    <% const features = restaurant.features || [
+                                        'Outdoor Seating', 
+                                        'Wheelchair Accessible', 
+                                        'Free WiFi',
+                                        'Vegetarian Options'
+                                    ] %>
+                                    <% features.forEach(feature => { %>
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> <%= feature %></li>
+                                    <% }) %>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="mb-3">Opening Hours</h5>
+                                <% const hours = restaurant.hours || {
+                                    'Monday': '11:00 AM - 10:00 PM',
+                                    'Tuesday': '11:00 AM - 10:00 PM',
+                                    'Wednesday': '11:00 AM - 10:00 PM',
+                                    'Thursday': '11:00 AM - 10:00 PM',
+                                    'Friday': '11:00 AM - 11:00 PM',
+                                    'Saturday': '10:00 AM - 11:00 PM',
+                                    'Sunday': '10:00 AM - 10:00 PM'
+                                } %>
+                                <% Object.entries(hours).forEach(([day, time]) => { %>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span><%= day %></span>
+                                        <span><%= time %></span>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Menu Section -->
+                    <section id="menu" class="mb-5">
+                        <h2 class="mb-4">Menu</h2>
+                        
+                        <!-- Menu Categories -->
+                        <% const menuCategories = restaurant.menuCategories || [
+                            {
+                                name: 'Appetizers',
+                                items: [
+                                    {name: 'Garlic Bread', description: 'Freshly baked bread with garlic butter', price: 5.99, imageUrl: '/images/menu/garlic-bread.jpg'},
+                                    {name: 'Mozzarella Sticks', description: 'Breaded mozzarella with marinara sauce', price: 7.99, imageUrl: '/images/menu/mozzarella-sticks.jpg'},
+                                    {name: 'Chicken Wings', description: 'Hot and spicy buffalo wings', price: 9.99, imageUrl: '/images/menu/wings.jpg'}
+                                ]
+                            },
+                            {
+                                name: 'Main Courses',
+                                items: [
+                                    {name: 'Grilled Salmon', description: 'Fresh salmon with lemon butter sauce', price: 18.99, imageUrl: '/images/menu/salmon.jpg'},
+                                    {name: 'Spaghetti Bolognese', description: 'Classic pasta with rich meat sauce', price: 14.99, imageUrl: '/images/menu/spaghetti.jpg'},
+                                    {name: 'Ribeye Steak', description: '12oz steak cooked to your preference', price: 24.99, imageUrl: '/images/menu/steak.jpg'}
+                                ]
+                            },
+                            {
+                                name: 'Desserts',
+                                items: [
+                                    {name: 'Tiramisu', description: 'Italian coffee-flavored dessert', price: 6.99, imageUrl: '/images/menu/tiramisu.jpg'},
+                                    {name: 'Chocolate Cake', description: 'Rich chocolate layer cake', price: 5.99, imageUrl: '/images/menu/chocolate-cake.jpg'}
+                                ]
+                            }
+                        ] %>
+                        
+                        <% menuCategories.forEach(category => { %>
+                            <div class="menu-category mb-4" id="menu-<%= category.name.toLowerCase().replace(/\s+/g, '-') %>">
+                                <h4 class="border-bottom pb-2 mb-3"><%= category.name %></h4>
+                                <div class="row">
+                                    <% category.items.forEach(item => { %>
+                                        <div class="col-lg-6 mb-3">
+                                            <div class="card h-100 shadow-sm">
+                                                <div class="row g-0">
+                                                    <div class="col-4">
+                                                        <% if(item.imageUrl) { %>
+                                                            <img src="<%= item.imageUrl %>" class="menu-item-img" alt="<%= item.name %>">
+                                                        <% } else { %>
+                                                            <div class="bg-light h-100 d-flex align-items-center justify-content-center">
+                                                                <i class="fas fa-utensils fa-2x text-secondary"></i>
+                                                            </div>
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <div class="card-body">
+                                                            <div class="d-flex justify-content-between">
+                                                                <h5 class="card-title"><%= item.name %></h5>
+                                                                <span class="fw-bold text-primary">$<%= item.price.toFixed(2) %></span>
+                                                            </div>
+                                                            <p class="card-text small text-muted"><%= item.description %></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </section>
+
+                    <!-- Reviews Section -->
+                    <section id="reviews" class="mb-5">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="mb-0">Customer Reviews</h2>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                                <i class="fas fa-star me-1"></i> Write a Review
+                            </button>
+                        </div>
+                        
+                        <!-- Reviews List -->
+                        <% const reviews = restaurant.reviews || [
+                            {
+                                name: 'John Doe',
+                                avatar: '/images/avatars/user1.jpg',
+                                rating: 5,
+                                date: '2025-03-15',
+                                comment: 'Amazing food and excellent service. The ribeye steak was cooked to perfection and the desserts were delicious. Will definitely come back!'
+                            },
+                            {
+                                name: 'Mary Smith',
+                                avatar: '/images/avatars/user2.jpg',
+                                rating: 4,
+                                date: '2025-03-10',
+                                comment: 'Great atmosphere and friendly staff. The pasta dishes are wonderful but the appetizers could use some improvement. Overall a good experience.'
+                            },
+                            {
+                                name: 'Robert Johnson',
+                                avatar: '/images/avatars/user3.jpg',
+                                rating: 5,
+                                date: '2025-02-28',
+                                comment: 'One of the best restaurants in the area! Fantastic menu selection and everything we ordered was delicious. Highly recommend the grilled salmon.'
+                            }
+                        ] %>
+                        
+                        <% reviews.forEach(review => { %>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex mb-3">
+                                        <% if(review.avatar) { %>
+                                            <img src="<%= review.avatar %>" class="review-avatar rounded-circle me-3" alt="<%= review.name %>">
+                                        <% } else { %>
+                                            <div class="review-avatar rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3">
+                                                <%= review.name.charAt(0) %>
+                                            </div>
+                                        <% } %>
+                                        <div>
+                                            <h5 class="mb-1"><%= review.name %></h5>
+                                            <div class="d-flex align-items-center">
+                                                <div class="review-rating me-3">
+                                                    <% for(let i = 0; i < 5; i++) { %>
+                                                        <i class="fas fa-star <%= i < review.rating ? 'text-warning' : 'text-muted' %>"></i>
+                                                    <% } %>
+                                                </div>
+                                                <small class="text-muted"><%= new Date(review.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="mb-0"><%= review.comment %></p>
+                                </div>
+                            </div>
+                        <% }) %>
+                        
+                        <!-- Load More Button -->
+                        <div class="text-center mt-4">
+                            <button class="btn btn-outline-primary">Load More Reviews</button>
+                        </div>
+                    </section>
+                </div>
+                
+                <!-- Right Side Column - Sidebar -->
+                <div class="col-lg-4">
+                    <div class="sticky-sidebar">
+                        <!-- Reservation Card -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body">
+                                <h4 class="card-title mb-3">Make a Reservation</h4>
+                                <form>
+                                    <div class="mb-3">
+                                        <label for="reservationDate" class="form-label">Date</label>
+                                        <input type="date" class="form-control" id="reservationDate">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="reservationTime" class="form-label">Time</label>
+                                        <select class="form-select" id="reservationTime">
+                                            <option value="">Select time</option>
+                                            <option>5:00 PM</option>
+                                            <option>5:30 PM</option>
+                                            <option>6:00 PM</option>
+                                            <option>6:30 PM</option>
+                                            <option>7:00 PM</option>
+                                            <option>7:30 PM</option>
+                                            <option>8:00 PM</option>
+                                            <option>8:30 PM</option>
+                                            <option>9:00 PM</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="partySize" class="form-label">Party Size</label>
+                                        <select class="form-select" id="partySize">
+                                            <option value="1">1 person</option>
+                                            <option value="2" selected>2 people</option>
+                                            <option value="3">3 people</option>
+                                            <option value="4">4 people</option>
+                                            <option value="5">5 people</option>
+                                            <option value="6">6 people</option>
+                                            <option value="7">7+ people</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">Find a Table</button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Contact Information -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body">
+                                <h4 class="card-title mb-3">Contact Information</h4>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="fas fa-phone me-2 text-primary"></i>
+                                        <a href="tel:<%= restaurant.phone || '+1234567890' %>" class="text-decoration-none">
+                                            <%= restaurant.phone || '+1 (234) 567-890' %>
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-envelope me-2 text-primary"></i>
+                                        <a href="mailto:<%= restaurant.email || 'info@example.com' %>" class="text-decoration-none">
+                                            <%= restaurant.email || 'info@example.com' %>
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-globe me-2 text-primary"></i>
+                                        <a href="<%= restaurant.website || '#' %>" target="_blank" class="text-decoration-none">
+                                            <%= restaurant.website || 'Visit Website' %>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Review Modal -->
+    <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reviewModalLabel">Write a Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/restaurants/<%= restaurant._id || restaurant.id %>/reviews" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Rating</label>
+                            <div class="rating-stars">
+                                <div class="btn-group" role="group" aria-label="Rating">
+                                    <% for(let i = 1; i <= 5; i++) { %>
+                                        <input type="radio" class="btn-check" name="rating" id="rating<%= i %>" value="<%= i %>" <%= i === 5 ? 'checked' : '' %>>
+                                        <label class="btn btn-outline-warning" for="rating<%= i %>">
+                                            <i class="fas fa-star"></i>
+                                        </label>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reviewComment" class="form-label">Your Review</label>
+                            <textarea class="form-control" id="reviewComment" name="comment" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Photo Modal -->
+    <div class="modal fade" id="photoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Photo Gallery</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="" class="img-fluid" id="modalImage" alt="Restaurant Photo">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 w-100 vw-100">
+        <div class="container-fluid px-lg-5">
+            <div class="row px-3 px-lg-5">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <img src="/images/logo.png" alt="Logo" height="45" class="mb-3">
+                    <p class="mb-0">&copy; 2025 Restaurant Finder. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="mb-3">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-twitter"></i></a>
+                    </div>
+                    <p class="small text-muted mb-0">Discover amazing places to eat and drink</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 90,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update active nav links
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+        
+        // Handle image modals
+        document.querySelectorAll('[data-bs-target="#photoModal"]').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const imgSrc = this.querySelector('img').getAttribute('src');
+                document.getElementById('modalImage').setAttribute('src', imgSrc);
+            });
+        });
+        
+        // Track scroll position to update active nav links
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('section[id]');
+            let currentSection = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                const sectionHeight = section.offsetHeight;
+                if (pageYOffset >= sectionTop && pageYOffset < sectionTop + sectionHeight) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + currentSection) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

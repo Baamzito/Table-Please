@@ -27,12 +27,15 @@
           <div class="dropdown">
             <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" type="button" id="userMenuDropdown" 
                    data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="<%= user.profileImage || '/images/default-avatar.png' %>" alt="Perfil" 
+              <img src="<%= user.profileImage || '/images/default-avatar.jpg' %>" alt="Perfil" 
                    class="rounded-circle me-2" width="30" height="30">
-              <span><%= user.name %></span>
+              <span><%= user.username %></span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
               <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2 text-primary"></i>My Profile</a></li>
+              <% if (user.role == 'customer' || user.role == 'admin') { %>
+                <li><a class="dropdown-item" href="/profile"><i class="fas fa-gear me-2 text-primary"></i>Management</a></li>
+              <% } %>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="/auth/logout"><i class="fas fa-sign-out-alt me-2 text-primary"></i>Logout</a></li>
             </ul>
