@@ -1,294 +1,199 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-</head>
-<body>
-    <%- include('../partials/navbar') %>
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
 
-  <div class="container mt-5 pt-5">
-    <% if (locals.error) { %>
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <%= error %>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    <% } %>
-    
-    <div class="row">
-      <!-- Sidebar / Menu -->
-      <div class="col-lg-3 mb-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <div class="text-center mb-3">
-              <img src="<%= user.profileImage || '/images/default-avatar.jpg' %>" alt="Profile Picture" 
-                   class="img-fluid rounded-circle profile-image mb-3" style="width: 120px; height: 120px; object-fit: cover;">
-              <h5 class="mb-0"><%= user.name %></h5>
-              <p class="text-muted small">@<%= user.username %></p>
-            </div>
-            
-            <hr>
-            
-            <div class="profile-menu">
-              <ul class="nav flex-column">
-                <li class="nav-item">
-                  <a class="nav-link" href="/profile">
-                    <i class="fas fa-user me-2"></i>My Profile
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="/profile/favorites">
-                    <i class="fas fa-heart me-2"></i>Favorite Restaurants
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="/profile/reviews">
-                    <i class="fas fa-star me-2"></i>My Reviews
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="/profile/bookmarks">
-                    <i class="fas fa-bookmark me-2"></i>Bookmarked
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="/profile/change-password">
-                    <i class="fas fa-lock me-2"></i>Change Password
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link text-danger" href="/auth/logout">
-                    <i class="fas fa-sign-out-alt me-2"></i>Logout
-                  </a>
-                </li>
-              </ul>
-            </div>
+<div class="container mt-5 pt-5">
+  <% if (locals.error) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <%= error %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+  
+  <div class="row">
+    <!-- Sidebar / Menu -->
+    <div class="col-lg-3 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-center mb-3">
+            <img src="<%= user.profileImage || '/images/default-avatar.jpg' %>" alt="Profile Picture" 
+                 class="img-fluid rounded-circle profile-image mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+            <h5 class="mb-0"><%= user.firstName + ' ' + user.lastName %></h5>
+            <p class="text-muted small">@<%= user.username %></p>
+            <% if(user.address && user.address.city) { %>
+              <p class="text-muted small"><i class="fas fa-map-marker-alt me-1"></i><%= user.address.city %></p>
+            <% } %>
           </div>
-        </div>
-      </div>
-      
-      <!-- Main Content -->
-      <div class="col-lg-9">
-        <div class="card shadow-sm mb-4">
-          <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">Edit Profile</h5>
-            <a href="/profile" class="btn btn-sm btn-outline-secondary">
-              <i class="fas fa-arrow-left me-1"></i>Back to Profile
-            </a>
-          </div>
-          <div class="card-body">
-            <form action="/profile/update" method="POST" enctype="multipart/form-data">
-              <div class="mb-4">
-                <label class="form-label">Profile Picture</label>
-                <div class="d-flex align-items-center">
-                  <div class="position-relative me-3">
-                    <img src="<%= user.profileImage || '/images/default-avatar.png' %>" alt="Current Profile Picture" 
-                         class="rounded-circle preview-image" style="width: 100px; height: 100px; object-fit: cover;">
-                         <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 rounded-circle remove-image <%= user.profileImage ? 'd-block' : 'd-none' %>">
-                      <i class="fas fa-times"></i>
-                    </button>
-                  </div>
-                  <div>
-                    <input type="file" class="form-control mb-2" id="profileImage" name="profileImage" accept="image/*">
-                    <input type="hidden" id="removeImage" name="removeImage" value="false">
-                    <small class="text-muted">Max file size: 5MB. Supported formats: JPG, PNG, GIF.</small>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="row mb-3">
-                <div class="col-md-6 mb-3">
-                  <label for="name" class="form-label">Full Name</label>
-                  <input type="text" class="form-control" id="name" name="name" 
-                         value="<%= user.name %>" required>
-                </div>
-                
-                <div class="col-md-6 mb-3">
-                  <label for="username" class="form-label">Username</label>
-                  <input type="text" class="form-control" id="username" name="username" 
-                         value="<%= user.username %>" required>
-                  <div class="form-text">Username must be unique and contain only letters, numbers, and underscores.</div>
-                </div>
-              </div>
-              
-              <div class="row mb-3">
-                <div class="col-md-6 mb-3">
-                  <label for="email" class="form-label">Email Address</label>
-                  <input type="email" class="form-control" id="email" name="email" 
-                         value="<%= user.email %>" required>
-                </div>
-                
-                <div class="col-md-6 mb-3">
-                  <label for="location" class="form-label">Location</label>
-                  <input type="text" class="form-control" id="location" name="location" 
-                         value="<%= user.location || '' %>" placeholder="City, State or Zip Code">
-                </div>
-              </div>
-              
-              <div class="mb-3">
-                <label for="bio" class="form-label">Bio</label>
-                <textarea class="form-control" id="bio" name="bio" rows="3" 
-                          placeholder="Tell us a bit about yourself"><%= user.bio || '' %></textarea>
-              </div>
-              
-              <!-- Food Preferences Section -->
-              <h5 class="mt-4 mb-3" id="preferences">Food Preferences</h5>
-              
-              <div class="mb-3">
-                <label class="form-label">Favorite Cuisines</label>
-                <select class="form-select cuisine-select" name="cuisines" multiple>
-                  <% 
-                  const allCuisines = ['Italian', 'Japanese', 'Chinese', 'Mexican', 'Indian', 'American', 'Thai', 'French', 'Spanish', 'Greek', 'Lebanese', 'Turkish', 'Korean', 'Vietnamese'];
-                  const userCuisines = (user.preferences && user.preferences.cuisines) || [];
-                  %>
-                  
-                  <% allCuisines.forEach(cuisine => { %>
-                    <option value="<%= cuisine %>" <%= userCuisines.includes(cuisine) ? 'selected' : '' %>><%= cuisine %></option>
-                  <% }); %>
-                </select>
-                <div class="form-text">Select multiple cuisines that you enjoy.</div>
-              </div>
-              
-              <div class="mb-4">
-                <label class="form-label">Dietary Restrictions</label>
-                <div class="row">
-                  <% 
-                  const dietaryOptions = [
-                    {value: 'vegetarian', label: 'Vegetarian'},
-                    {value: 'vegan', label: 'Vegan'},
-                    {value: 'gluten-free', label: 'Gluten-Free'},
-                    {value: 'dairy-free', label: 'Dairy-Free'},
-                    {value: 'nut-allergy', label: 'Nut Allergy'},
-                    {value: 'halal', label: 'Halal'},
-                    {value: 'kosher', label: 'Kosher'}
-                  ];
-                  const userDietary = (user.preferences && user.preferences.dietaryRestrictions) || [];
-                  %>
-                  
-                  <% dietaryOptions.forEach(option => { %>
-                    <div class="col-md-6 col-lg-4 mb-2">
-                      <div class="form-check">
-                        <input class="form-check-input" type="checkbox" 
-                               id="<%= option.value %>" name="dietaryRestrictions" 
-                               value="<%= option.value %>" 
-                               <%= userDietary.includes(option.value) ? 'checked' : '' %>>
-                        <label class="form-check-label" for="<%= option.value %>">
-                          <%= option.label %>
-                        </label>
-                      </div>
-                    </div>
-                  <% }); %>
-                </div>
-              </div>
-              
-              <!-- Privacy Settings -->
-              <h5 class="mt-4 mb-3">Privacy Settings</h5>
-              
-              <div class="mb-4">
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" 
-                         id="showEmail" name="privacy[showEmail]" 
-                         <%= (user.privacy && user.privacy.showEmail) ? 'checked' : '' %>>
-                  <label class="form-check-label" for="showEmail">
-                    Show my email to other users
-                  </label>
-                </div>
-                
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" 
-                         id="showLocation" name="privacy[showLocation]" 
-                         <%= (user.privacy && user.privacy.showLocation) ? 'checked' : '' %>>
-                  <label class="form-check-label" for="showLocation">
-                    Show my location to other users
-                  </label>
-                </div>
-                
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" 
-                         id="publicProfile" name="privacy[publicProfile]" 
-                         <%= (user.privacy && user.privacy.publicProfile) ? 'checked' : '' %>>
-                  <label class="form-check-label" for="publicProfile">
-                    Make my profile public
-                  </label>
-                </div>
-              </div>
-              
-              <!-- Notification Preferences -->
-              <h5 class="mt-4 mb-3">Notification Preferences</h5>
-              
-              <div class="mb-4">
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" 
-                         id="emailNotifications" name="notifications[email]" 
-                         <%= (user.notifications && user.notifications.email) ? 'checked' : '' %>>
-                  <label class="form-check-label" for="emailNotifications">
-                    Receive email notifications
-                  </label>
-                </div>
-                
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" 
-                         id="reviewNotifications" name="notifications[reviews]" 
-                         <%= (user.notifications && user.notifications.reviews) ? 'checked' : '' %>>
-                  <label class="form-check-label" for="reviewNotifications">
-                    Notify me when someone responds to my reviews
-                  </label>
-                </div>
-                
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" 
-                         id="newRestaurantNotifications" name="notifications[newRestaurants]" 
-                         <%= (user.notifications && user.notifications.newRestaurants) ? 'checked' : '' %>>
-                  <label class="form-check-label" for="newRestaurantNotifications">
-                    Notify me about new restaurants in my area
-                  </label>
-                </div>
-              </div>
-              
-              <div class="d-flex justify-content-between mt-4">
-                <a href="/profile" class="btn btn-outline-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">
-                  <i class="fas fa-save me-2"></i>Save Changes
-                </button>
-              </div>
-            </form>
+          
+          <hr>
+          
+          <div class="profile-menu">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="/profile">
+                  <i class="fas fa-user me-2"></i>My Profile
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/profile/change-password">
+                  <i class="fas fa-lock me-2"></i>Change Password
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-danger" href="/auth/logout">
+                  <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Bootstrap Bundle with Popper -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
-  <!-- Custom script for image preview and removal -->
-  <script>
-    // Profile image preview
-    document.getElementById('profileImage').addEventListener('change', function(e) {
-      if (e.target.files && e.target.files[0]) {
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-          document.querySelector('.preview-image').src = e.target.result;
-          document.querySelector('.remove-image').style.display = 'block';
-          document.getElementById('removeImage').value = 'false';
-        }
-        
-        reader.readAsDataURL(e.target.files[0]);
-      }
-    });
     
-    // Remove profile image
-    document.querySelector('.remove-image').addEventListener('click', function() {
-      document.querySelector('.preview-image').src = '/images/default-avatar.png';
-      document.getElementById('profileImage').value = '';
-      this.style.display = 'none';
-      document.getElementById('removeImage').value = 'true';
-    });
-  </script>
-</body>
-</html>
+    <!-- Main Content -->
+    <div class="col-lg-9">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">Edit Profile</h5>
+          <a href="/profile" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Back to Profile
+          </a>
+        </div>
+        <div class="card-body">
+          <form action="/profile/update" method="POST" enctype="multipart/form-data">
+            <div class="mb-4">
+              <label class="form-label">Profile Picture</label>
+              <div class="d-flex align-items-center">
+                <div class="position-relative me-3">
+                  <img src="<%= user.profileImage || '/images/default-avatar.png' %>" alt="Current Profile Picture" 
+                       class="rounded-circle preview-image" style="width: 100px; height: 100px; object-fit: cover;">
+                       <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 rounded-circle remove-image <%= user.profileImage ? 'd-block' : 'd-none' %>">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                <div>
+                  <input type="file" class="form-control mb-2" id="profileImage" name="profileImage" accept="image/*">
+                  <input type="hidden" id="removeImage" name="removeImage" value="false">
+                  <small class="text-muted">Max file size: 5MB. Supported formats: JPG, PNG, GIF.</small>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Personal Information -->
+            <h5 class="mt-4 mb-3">Personal Information</h5>
+            
+            <div class="row mb-3">
+              <div class="col-md-6 mb-3">
+                <label for="firstName" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="firstName" name="firstName" 
+                       value="<%= user.firstName %>" required>
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="lastName" class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="lastName" name="lastName" 
+                       value="<%= user.lastName %>" required>
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6 mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" 
+                       value="<%= user.username %>" required>
+                <div class="form-text">Username must be unique and contain only letters, numbers, and underscores.</div>
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" 
+                       value="<%= user.email %>" required>
+              </div>
+            </div>
+            
+            <!-- Address Information -->
+            <h5 class="mt-4 mb-3" id="address">Address Information</h5>
+            
+            <div class="row mb-3">
+              <div class="col-md-12 mb-3">
+                <label for="address_street" class="form-label">Street</label>
+                <input type="text" class="form-control" id="address_street" name="address[street]" 
+                       value="<%= user.address && user.address.street ? user.address.street : '' %>">
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="address_city" class="form-label">City</label>
+                <input type="text" class="form-control" id="address_city" name="address[city]" 
+                       value="<%= user.address && user.address.city ? user.address.city : '' %>">
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="address_postalCode" class="form-label">Postal Code</label>
+                <input type="text" class="form-control" id="address_postalCode" name="address[postalCode]" 
+                       value="<%= user.address && user.address.postalCode ? user.address.postalCode : '' %>">
+              </div>
+            </div>
+            
+            <!-- Restaurant Validation (Only for restaurant accounts) -->
+            <% if (user.role === 'restaurant') { %>
+              <h5 class="mt-4 mb-3">Restaurant Validation</h5>
+              <div class="card mb-4 border-<%= user.validated ? 'success' : 'warning' %>">
+                <div class="card-body">
+                  <% if (user.validated) { %>
+                    <div class="d-flex align-items-center">
+                      <span class="badge bg-success me-2"><i class="fas fa-check me-1"></i>Validated</span>
+                      <span>Your restaurant is verified and visible to all users.</span>
+                    </div>
+                  <% } else { %>
+                    <div class="d-flex align-items-center">
+                      <span class="badge bg-warning text-dark me-2">
+                        <i class="fas fa-exclamation-triangle me-1"></i>Pending Validation
+                      </span>
+                      <span>Please complete your profile to help speed up the validation process.</span>
+                    </div>
+                  <% } %>
+                </div>
+              </div>
+            <% } %>
+            
+            <div class="d-flex justify-content-between mt-4">
+              <a href="/profile" class="btn btn-outline-secondary">Cancel</a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom script for image preview and removal -->
+<script>
+  // Profile image preview
+  document.getElementById('profileImage').addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) {
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        document.querySelector('.preview-image').src = e.target.result;
+        document.querySelector('.remove-image').style.display = 'block';
+        document.getElementById('removeImage').value = 'false';
+      }
+      
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  });
+  
+  // Remove profile image
+  document.querySelector('.remove-image').addEventListener('click', function() {
+    document.querySelector('.preview-image').src = '/images/default-avatar.png';
+    document.getElementById('profileImage').value = '';
+    this.style.display = 'none';
+    document.getElementById('removeImage').value = 'true';
+  });
+</script>

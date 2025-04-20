@@ -1,10 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const verifyToken = require('../middleware/verifyToken')
+const User = require('../models/user')
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/', async function (req, res, next) {
+  try {
+    if (req.user) {
+      const userData = await User.findById(req.user.id);
+      res.render('index', { user: userData, title: 'Table Please' });
+    } else {
+      res.render('index', { user: null, title: 'Table Please' });
+    }
+  } catch (error) {
+    res.status(500).send('Erro ao buscar dados do perfil');
+  }
 });
 
 module.exports = router;

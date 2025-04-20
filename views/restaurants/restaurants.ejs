@@ -1,341 +1,355 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        /* Estilos específicos para esta página - complementares ao CSS existente */
-        body {
-          padding-top: 76px;
-          padding: 0;
-        }
-        .filters-section {
-          background-color: #f8f9fa;
-        }
-        .list-view-img {
-          width: 100%;
-          height: 100px;
-          object-fit: cover;
-        }
-        /* Isso é apenas para manter a consistência com seu CSS existente */
-        .navbar-logo {
-          height: 45px;
-          width: auto;
-        }
-    </style>
-</head>
-<body>
-    <%- include('../partials/navbar') %>
-    <!-- Hero Section with Search -->
-    <section class="hero-section position-relative w-100 vw-100">
-        <div class="hero-bg-overlay position-absolute w-100 h-100"></div>
-        <div class="container-fluid position-relative py-5">
-        <div class="row align-items-center py-4">
-            <div class="col-lg-8 mx-auto text-center">
-            <h1 class="display-4 text-white fw-bold mb-3">Explore Restaurants</h1>
-            <p class="lead text-white mb-4">Discover amazing places to eat and drink</p>
-            
-            <div class="search-container bg-white p-3 rounded shadow mx-3 mx-md-auto" style="max-width: 800px;">
-                <form action="/restaurants/search" method="GET">
-                <div class="row g-2">
-                    <div class="col-md-5">
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-0">
-                        <i class="fas fa-utensils text-primary"></i>
-                        </span>
-                        <input type="text" class="form-control border-0" name="keyword" placeholder="Restaurant name or cuisine">
-                    </div>
-                    </div>
-                    <div class="col-md-5">
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-0">
-                        <i class="fas fa-map-marker-alt text-primary"></i>
-                        </span>
-                        <input type="text" class="form-control border-0" name="location" placeholder="Location">
-                    </div>
-                    </div>
-                    <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-search me-2"></i>Search
-                    </button>
-                    </div>
-                </div>
-                </form>
-            </div>
-            </div>
-        </div>
-        </div>
-    </section>
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
 
-    <!-- Filters Section -->
-    <section class="filters-section py-3 border-bottom">
-        <div class="container-fluid px-lg-5">
-        <div class="row align-items-center px-3 px-lg-5">
-            <div class="col-md-6 mb-3 mb-md-0">
-            <span class="text-muted"><strong><%= restaurants.length %></strong> restaurants found</span>
-            </div>
-            <div class="col-md-6">
-            <div class="d-flex justify-content-md-end">
-                <div class="me-3">
-                <select class="form-select form-select-sm" id="sortSelect">
-                    <option value="rating">Sort by Rating</option>
-                    <option value="name">Sort by Name</option>
-                    <option value="price">Sort by Price</option>
-                </select>
-                </div>
-                <div class="btn-group" role="group">
-                <button type="button" class="btn btn-outline-secondary btn-sm active" id="gridViewBtn">
-                    <i class="fas fa-th-large"></i>
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" id="listViewBtn">
-                    <i class="fas fa-list"></i>
-                </button>
-                </div>
-            </div>
-            </div>
-        </div>
-        </div>
-    </section>
+<!-- Hero Section with Search -->
+<section class="hero-section position-relative w-100">
+  <div class="hero-bg-overlay position-absolute w-100 h-100"></div>
+  <div class="container-fluid position-relative py-5">
+    <div class="row align-items-center py-4">
+      <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-4 text-white fw-bold mb-3">Explore Restaurants</h1>
+        <p class="lead text-white mb-4">
+          Discover amazing places to eat and drink
+        </p>
 
-    <!-- Restaurants List -->
-    <section class="py-5 w-100 vw-100">
-        <div class="container-fluid px-lg-5">
-        <div class="row px-3 px-lg-5" id="restaurantsGrid">
-            <% if(restaurants.length === 0) { %>
-            <div class="col-12 text-center py-5">
-                <div class="alert alert-info">
-                <i class="fas fa-info-circle me-2"></i> No restaurants found. Try adjusting your search criteria.
+        <div
+          class="search-container bg-white p-3 rounded shadow mx-3 mx-md-auto"
+          style="max-width: 800px"
+        >
+          <form action="/restaurants/search" method="GET">
+            <div class="row g-2">
+              <div class="col-md-5">
+                <div class="input-group">
+                  <span class="input-group-text bg-transparent border-0">
+                    <i class="fas fa-utensils text-primary"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control border-0"
+                    name="keyword"
+                    placeholder="Restaurant name or cuisine"
+                  />
                 </div>
-                <a href="/restaurants" class="btn btn-primary mt-3">Clear Filters</a>
+              </div>
+              <div class="col-md-5">
+                <div class="input-group">
+                  <span class="input-group-text bg-transparent border-0">
+                    <i class="fas fa-map-marker-alt text-primary"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control border-0"
+                    name="location"
+                    placeholder="Location"
+                  />
+                </div>
+              </div>
+              <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                  <i class="fas fa-search me-2"></i>Search
+                </button>
+              </div>
             </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Filters Section -->
+<section class="filters-section py-3 border-bottom">
+  <div class="container-fluid px-lg-5">
+    <div class="row align-items-center px-3 px-lg-5">
+      <div class="col-md-6 mb-3 mb-md-0">
+        <span class="text-muted">
+          <strong><%= restaurants.length %></strong> restaurants found
+        </span>
+      </div>
+      <div class="col-md-6">
+        <div class="d-flex justify-content-md-end">
+          <div class="me-3">
+            <select class="form-select form-select-sm" id="sortSelect">
+              <option value="rating">Sort by Rating</option>
+              <option value="name">Sort by Name</option>
+              <option value="price">Sort by Price</option>
+            </select>
+          </div>
+          <div class="btn-group" role="group">
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm active"
+              id="gridViewBtn"
+            >
+              <i class="fas fa-th-large"></i>
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm"
+              id="listViewBtn"
+            >
+              <i class="fas fa-list"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Restaurants List -->
+<section class="py-5 w-100">
+  <div class="container-fluid px-lg-5">
+    <div class="row px-3 px-lg-5" id="restaurantsGrid">
+      <% if(restaurants.length === 0) { %>
+      <div class="col-12 text-center py-5">
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i> No restaurants found. Try
+          adjusting your search criteria.
+        </div>
+        <a href="/restaurants" class="btn btn-primary mt-3">Clear Filters</a>
+      </div>
+      <% } else { %> 
+        <% restaurants.forEach(restaurant => { %>
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100 shadow-sm hover-card">
+            <% if(restaurant.imageUrl) { %>
+            <img
+              src="<%= restaurant.imageUrl %>"
+              class="card-img-top restaurant-img"
+              alt="<%= restaurant.name %>"
+            />
             <% } else { %>
-            <% restaurants.forEach(restaurant => { %>
-                <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100 shadow-sm hover-card">
-                    <% if(restaurant.imageUrl) { %>
-                    <img src="<%= restaurant.imageUrl %>" class="card-img-top restaurant-img" alt="<%= restaurant.name %>">
-                    <% } else { %>
-                    <div class="bg-light text-center py-5 restaurant-img">
-                        <i class="fas fa-utensils fa-3x text-secondary"></i>
-                    </div>
-                    <% } %>
-                    <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="card-title mb-0"><%= restaurant.name %></h5>
-                        <% if(restaurant.rating) { %>
-                        <span class="badge bg-primary rounded-pill">
-                            <i class="fas fa-star me-1"></i><%= typeof restaurant.rating === 'number' ? restaurant.rating.toFixed(1) : restaurant.rating %>
-                        </span>
-                        <% } %>
-                    </div>
-                    <p class="text-muted small mb-1">
-                        <% if(restaurant.cuisine) { %>
-                        <i class="fas fa-utensils me-2"></i><%= restaurant.cuisine %>
-                        <% } %>
-                    </p>
-                    <p class="text-muted small mb-2">
-                        <i class="fas fa-map-marker-alt me-2"></i><%= restaurant.address || restaurant.location || 'Address not available' %>
-                    </p>
-                    <% if(restaurant.description) { %>
-                        <p class="card-text text-truncate"><%= restaurant.description %></p>
-                    <% } %>
-                    </div>
-                    <div class="card-footer bg-white border-top-0">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <% if(restaurant.priceRange) { %>
-                        <div class="text-muted">
-                            <% for(let i = 0; i < restaurant.priceRange; i++) { %>
-                            <i class="fas fa-dollar-sign"></i>
-                            <% } %>
-                        </div>
-                        <% } %>
-                        <a href="/restaurants/<%= restaurant._id%>" class="btn btn-outline-primary btn-sm">View Details</a>
-                    </div>
-                    </div>
-                </div>
-                </div>
-            <% }) %>
+            <div class="bg-light text-center py-5 restaurant-img">
+              <i class="fas fa-utensils fa-3x text-secondary"></i>
+            </div>
             <% } %>
-        </div>
-
-        <!-- List View (Hidden by default) -->
-        <div class="row px-3 px-lg-5 d-none" id="restaurantsList">
-            <div class="col-12">
-            <div class="list-group">
-                <% restaurants.forEach(restaurant => { %>
-                <a href="/restaurants/<%= restaurant._id || restaurant.id %>" class="list-group-item list-group-item-action mb-2 shadow-sm">
-                    <div class="row align-items-center">
-                    <div class="col-md-2 mb-2 mb-md-0">
-                        <% if(restaurant.imageUrl) { %>
-                        <img src="<%= restaurant.imageUrl %>" class="img-fluid rounded list-view-img" alt="<%= restaurant.name %>">
-                        <% } else { %>
-                        <div class="bg-light text-center py-4 rounded">
-                            <i class="fas fa-utensils fa-2x text-secondary"></i>
-                        </div>
-                        <% } %>
-                    </div>
-                    <div class="col-md-7">
-                        <h5 class="mb-1"><%= restaurant.name %></h5>
-                        <div class="mb-1">
-                        <% if(restaurant.cuisine) { %>
-                            <span class="badge bg-light text-dark me-2"><i class="fas fa-utensils me-1"></i><%= restaurant.cuisine %></span>
-                        <% } %>
-                        <% if(restaurant.priceRange) { %>
-                            <span class="badge bg-light text-dark">
-                            <% for(let i = 0; i < restaurant.priceRange; i++) { %>
-                                <i class="fas fa-dollar-sign"></i>
-                            <% } %>
-                            </span>
-                        <% } %>
-                        </div>
-                        <p class="text-muted small mb-1">
-                        <i class="fas fa-map-marker-alt me-1"></i><%= restaurant.address || restaurant.location || 'Address not available' %>
-                        </p>
-                        <% if(restaurant.description) { %>
-                        <p class="small text-muted text-truncate"><%= restaurant.description %></p>
-                        <% } %>
-                    </div>
-                    <div class="col-md-3 text-md-end">
-                        <% if(restaurant.rating) { %>
-                        <div class="mb-2">
-                            <span class="badge bg-primary rounded-pill">
-                            <i class="fas fa-star me-1"></i><%= typeof restaurant.rating === 'number' ? restaurant.rating.toFixed(1) : restaurant.rating %>
-                            </span>
-                        </div>
-                        <% } %>
-                        <button class="btn btn-sm btn-outline-primary">View Details</button>
-                    </div>
-                    </div>
-                </a>
-                <% }) %>
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="card-title mb-0"><%= restaurant.name %></h5>
+                <% if(restaurant.rating) { %>
+                <span class="badge bg-primary rounded-pill">
+                  <i class="fas fa-star me-1"></i>
+                  <%= typeof restaurant.rating === 'number' ? restaurant.rating.toFixed(1) : restaurant.rating %>
+                </span>
+                <% } %>
+              </div>
+              <p class="text-muted small mb-1">
+                <% if(restaurant.cuisine) { %>
+                <i class="fas fa-utensils me-2"></i><%= restaurant.cuisine %>
+                <% } %>
+              </p>
+              <p class="text-muted small mb-2">
+                <i class="fas fa-map-marker-alt me-2"></i>
+                <%= restaurant.address || restaurant.location || 'Address not available' %>
+              </p>
+              <% if(restaurant.description) { %>
+              <p class="card-text text-truncate"><%= restaurant.description %></p>
+              <% } %>
             </div>
-            </div>
-        </div>
-
-        <!-- Pagination -->
-        <% if(restaurants.length > 0) { %>
-            <div class="row mt-4 px-3 px-lg-5">
-            <div class="col-12">
-                <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
-                        <i class="fas fa-angle-left"></i>
-                    </a>
-                    </li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                    <a class="page-link" href="#">
-                        <i class="fas fa-angle-right"></i>
-                    </a>
-                    </li>
-                </ul>
-                </nav>
-            </div>
-            </div>
-        <% } %>
-        </div>
-    </section>
-
-    <!-- Popular Cuisines -->
-    <section class="py-5 bg-light w-100 vw-100">
-        <div class="container-fluid px-lg-5">
-        <div class="row mb-4">
-            <div class="col-12">
-            <h2 class="text-center mb-4">Popular Cuisines</h2>
-            <p class="text-center text-muted">Explore restaurants by your favorite cuisine types</p>
-            </div>
-        </div>
-        
-        <div class="row justify-content-center px-3 px-lg-5">
-            <% const cuisines = [
-            {name: 'Italian', icon: 'fa-pizza-slice', count: 42},
-            {name: 'Japanese', icon: 'fa-fish', count: 38},
-            {name: 'American', icon: 'fa-burger', count: 35},
-            {name: 'Mexican', icon: 'fa-pepper-hot', count: 29},
-            {name: 'Indian', icon: 'fa-bowl-food', count: 24},
-            {name: 'Chinese', icon: 'fa-bowl-rice', count: 22}
-            ]; %>
-            
-            <% cuisines.forEach(cuisine => { %>
-            <div class="col-6 col-md-4 col-lg-2 mb-4">
-                <a href="/restaurants/cuisine/<%= cuisine.name.toLowerCase() %>" class="text-decoration-none">
-                <div class="card text-center cuisine-card h-100 shadow-sm">
-                    <div class="card-body py-4">
-                    <i class="fas <%= cuisine.icon %> cuisine-icon mb-3"></i>
-                    <h5 class="card-title mb-1"><%= cuisine.name %></h5>
-                    <p class="text-muted small"><%= cuisine.count %> restaurants</p>
-                    </div>
+            <div class="card-footer bg-white border-top-0">
+              <div class="d-flex justify-content-between align-items-center">
+                <% if(restaurant.priceRange) { %>
+                <div class="text-muted">
+                  <% for(let i = 0; i < restaurant.priceRange; i++) { %>
+                  <i class="fas fa-dollar-sign"></i>
+                  <% } %>
                 </div>
-                </a>
+                <% } %>
+                <a
+                  href="/restaurants/<%= restaurant._id %>"
+                  class="btn btn-outline-primary btn-sm"
+                >View Details</a>
+              </div>
             </div>
-            <% }); %>
+          </div>
         </div>
-        </div>
-    </section>
+        <% }) %>
+      <% } %>
+    </div>
 
-    <!-- Join Community -->
-    <section class="py-5 bg-primary text-white w-100 vw-100">
-        <div class="container-fluid px-lg-5">
-        <div class="row align-items-center px-3 px-lg-5">
-            <div class="col-lg-8 mb-4 mb-lg-0">
-            <h2>Join Our Community of Food Lovers</h2>
-            <p class="lead mb-0">Create an account to save favorites, write reviews, and get personalized recommendations.</p>
+    <!-- List View (Hidden by default) -->
+    <div class="row px-3 px-lg-5 d-none" id="restaurantsList">
+      <div class="col-12">
+        <div class="list-group">
+          <% restaurants.forEach(restaurant => { %>
+          <a
+            href="/restaurants/<%= restaurant._id || restaurant.id %>"
+            class="list-group-item list-group-item-action mb-2 shadow-sm"
+          >
+            <div class="row align-items-center">
+              <div class="col-md-2 mb-2 mb-md-0">
+                <% if(restaurant.imageUrl) { %>
+                <img
+                  src="<%= restaurant.imageUrl %>"
+                  class="img-fluid rounded list-view-img"
+                  alt="<%= restaurant.name %>"
+                />
+                <% } else { %>
+                <div class="bg-light text-center py-4 rounded">
+                  <i class="fas fa-utensils fa-2x text-secondary"></i>
+                </div>
+                <% } %>
+              </div>
+              <div class="col-md-7">
+                <h5 class="mb-1"><%= restaurant.name %></h5>
+                <div class="mb-1">
+                  <% if(restaurant.cuisine) { %>
+                  <span class="badge bg-light text-dark me-2">
+                    <i class="fas fa-utensils me-1"></i><%= restaurant.cuisine %>
+                  </span>
+                  <% } %> 
+                  <% if(restaurant.priceRange) { %>
+                  <span class="badge bg-light text-dark">
+                    <% for(let i = 0; i < restaurant.priceRange; i++) { %>
+                    <i class="fas fa-dollar-sign"></i>
+                    <% } %>
+                  </span>
+                  <% } %>
+                </div>
+                <p class="text-muted small mb-1">
+                  <i class="fas fa-map-marker-alt me-1"></i>
+                  <%= restaurant.address || restaurant.location || 'Address not available' %>
+                </p>
+                <% if(restaurant.description) { %>
+                <p class="small text-muted text-truncate">
+                  <%= restaurant.description %>
+                </p>
+                <% } %>
+              </div>
+              <div class="col-md-3 text-md-end">
+                <% if(restaurant.rating) { %>
+                <div class="mb-2">
+                  <span class="badge bg-primary rounded-pill">
+                    <i class="fas fa-star me-1"></i>
+                    <%= typeof restaurant.rating === 'number' ? restaurant.rating.toFixed(1) : restaurant.rating %>
+                  </span>
+                </div>
+                <% } %>
+                <button class="btn btn-sm btn-outline-primary">
+                  View Details
+                </button>
+              </div>
             </div>
-            <div class="col-lg-4 text-lg-end">
-            <a href="/auth/signup" class="btn btn-light btn-lg">Sign Up Now</a>
-            </div>
+          </a>
+          <% }) %>
         </div>
-        </div>
-    </section>
+      </div>
+    </div>
 
-    <footer class="bg-dark text-white py-4 w-100 vw-100">
-        <div class="container-fluid px-lg-5">
-        <div class="row px-3 px-lg-5">
-            <div class="col-md-6 mb-3 mb-md-0">
-            <img src="/images/logo.png" alt="Logo" height="45" class="mb-3">
-            <p class="mb-0">&copy; 2025 Restaurant Finder. All rights reserved.</p>
+    <!-- Pagination -->
+    <% if(restaurants.length > 0) { %>
+    <div class="row mt-4 px-3 px-lg-5">
+      <div class="col-12">
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+              <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                <i class="fas fa-angle-left"></i>
+              </a>
+            </li>
+            <li class="page-item active">
+              <a class="page-link" href="#">1</a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+              <a class="page-link" href="#">
+                <i class="fas fa-angle-right"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</section>
+
+<!-- Popular Cuisines -->
+<section class="py-5 bg-light w-100">
+  <div class="container-fluid px-lg-5">
+    <div class="row mb-4">
+      <div class="col-12">
+        <h2 class="text-center mb-4">Popular Cuisines</h2>
+        <p class="text-center text-muted">
+          Explore restaurants by your favorite cuisine types
+        </p>
+      </div>
+    </div>
+
+    <div class="row justify-content-center px-3 px-lg-5">
+      <% 
+      const cuisines = [
+        {name: 'Italian', icon: 'fa-pizza-slice', count: 42}, 
+        {name: 'Japanese', icon: 'fa-fish', count: 38}, 
+        {name: 'American', icon: 'fa-burger', count: 35}, 
+        {name: 'Mexican', icon: 'fa-pepper-hot', count: 29}, 
+        {name: 'Indian', icon: 'fa-bowl-food', count: 24}, 
+        {name: 'Chinese', icon: 'fa-bowl-rice', count: 22}
+      ]; 
+      %>
+      
+      <% cuisines.forEach(cuisine => { %>
+      <div class="col-6 col-md-4 col-lg-2 mb-4">
+        <a
+          href="/restaurants/cuisine/<%= cuisine.name.toLowerCase() %>"
+          class="text-decoration-none"
+        >
+          <div class="card text-center cuisine-card h-100 shadow-sm">
+            <div class="card-body py-4">
+              <i class="fas <%= cuisine.icon %> cuisine-icon mb-3"></i>
+              <h5 class="card-title mb-1"><%= cuisine.name %></h5>
+              <p class="text-muted small"><%= cuisine.count %> restaurants</p>
             </div>
-            <div class="col-md-6 text-md-end">
-            <div class="mb-3">
-                <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="text-white"><i class="fab fa-twitter"></i></a>
-            </div>
-            <p class="small text-muted mb-0">Discover amazing places to eat and drink</p>
-            </div>
-        </div>
-        </div>
-    </footer>
+          </div>
+        </a>
+      </div>
+      <% }); %>
+    </div>
+  </div>
+</section>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Toggle between grid and list view
-        document.getElementById('gridViewBtn').addEventListener('click', function() {
-        document.getElementById('restaurantsGrid').classList.remove('d-none');
-        document.getElementById('restaurantsList').classList.add('d-none');
-        this.classList.add('active');
-        document.getElementById('listViewBtn').classList.remove('active');
-        });
+<!-- Join Community -->
+<section class="py-5 bg-primary text-white w-100">
+  <div class="container-fluid px-lg-5">
+    <div class="row align-items-center px-3 px-lg-5">
+      <div class="col-lg-8 mb-4 mb-lg-0">
+        <h2>Join Our Community of Food Lovers</h2>
+        <p class="lead mb-0">
+          Create an account to save favorites, write reviews, and get
+          personalized recommendations.
+        </p>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <a href="/auth/signup" class="btn btn-light btn-lg">Sign Up Now</a>
+      </div>
+    </div>
+  </div>
+</section>
 
-        document.getElementById('listViewBtn').addEventListener('click', function() {
-        document.getElementById('restaurantsGrid').classList.add('d-none');
-        document.getElementById('restaurantsList').classList.remove('d-none');
-        this.classList.add('active');
-        document.getElementById('gridViewBtn').classList.remove('active');
-        });
+<%- include('../partials/footer') %>
 
-        // Implementação básica de ordenação (seria substituída por chamadas ao servidor)
-        document.getElementById('sortSelect').addEventListener('change', function() {
-        // Aqui você implementaria a lógica real de ordenação
-        console.log('Ordenar por:', this.value);
-        });
-    </script>
-</body>
-</html>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Toggle between grid and list view
+  document.getElementById("gridViewBtn").addEventListener("click", function () {
+    document.getElementById("restaurantsGrid").classList.remove("d-none");
+    document.getElementById("restaurantsList").classList.add("d-none");
+    this.classList.add("active");
+    document.getElementById("listViewBtn").classList.remove("active");
+  });
+
+  document.getElementById("listViewBtn").addEventListener("click", function () {
+    document.getElementById("restaurantsGrid").classList.add("d-none");
+    document.getElementById("restaurantsList").classList.remove("d-none");
+    this.classList.add("active");
+    document.getElementById("gridViewBtn").classList.remove("active");
+  });
+
+  // Implementação básica de ordenação (seria substituída por chamadas ao servidor)
+  document.getElementById("sortSelect").addEventListener("change", function () {
+    // Aqui você implementaria a lógica real de ordenação
+    console.log("Ordenar por:", this.value);
+  });
+</script>

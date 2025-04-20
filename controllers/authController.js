@@ -5,37 +5,125 @@ const bcrypt = require('bcrypt')
 let authController = {}
 
 authController.showSignup = function(req, res){
-    res.render('auth/signup')
+    res.render('auth/signup', {title: 'Sign up'})
 }
 
 authController.showLogin = function(req, res){
-    res.render('auth/login')
+    res.render('auth/login', {title: 'Login'})
 }
 
 authController.signup = async function(req, res){
-    const {username, password, role, firstName, lastName} = req.body;
+    const { username, password, email, role, firstName, lastName, street, city, postalCode } = req.body;
 
     if (!username || typeof username !== 'string' || username.trim().length < 5) {
-        return res.status(400).json({ error: 'Username is required and must be at least 5 characters long.' });
+        return res.render('auth/signup', { 
+            title: 'Sign up',
+            error: 'Username is required and must be at least 5 characters long.' 
+        });
     }
 
-    if (!password || typeof password !== 'string' || password.length < 5) {
-        return res.status(400).json({ error: 'Password is required and must be at least 5 characters long.' });
+    if (!password || typeof password !== 'string' || password.length < 8) {
+        return res.render('auth/signup', { 
+            title: 'Sign up',
+            error: 'Password is required and must be at least 8 characters long.' 
+        });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+        return res.render('auth/signup', { 
+            title: 'Sign up',
+            error: 'Please enter a valid email address.' 
+        });
+    }
+
+    const validRoles = ['customer', 'restaurant'];
+    if (!role || !validRoles.includes(role)) {
+        return res.render('auth/signup', {
+            title: 'Sign up',
+            error: 'Please select a valid account type.' 
+        });
     }
 
     if (!firstName || typeof firstName !== 'string' || firstName.trim() === '') {
-        return res.status(400).json({ error: 'First name is required and must be a non-empty string.' });
+        return res.render('auth/signup', { 
+            title: 'Sign up',
+            error: 'First name is required.' 
+        });
     }
 
     if (!lastName || typeof lastName !== 'string' || lastName.trim() === '') {
-        return res.status(400).json({ error: 'Last name is required and must be a non-empty string.' });
+        return res.render('auth/signup', { 
+            title: 'Sign up',
+            error: 'Last name is required.' 
+        });
     }
 
-    try{
-        const user = await User.create({username, password, role, firstName, lastName})
-        res.status(201).json(user)
-    } catch(err){
-        res.status(400).send('Error: User was not created!')
+    if (!street || typeof street !== 'string' || street.trim() === '') {
+        return res.render('auth/signup', { 
+            title: 'Sign up',
+            error: 'Street address is required.' 
+        });
+    }
+
+    if (!city || typeof city !== 'string' || city.trim() === '') {
+        return res.render('auth/signup', { 
+            title: 'Sign up',
+            error: 'City is required.' 
+        });
+    }
+
+    const postalRegex = /^[0-9]{4}-[0-9]{3}$/;
+    if (!postalCode || !postalRegex.test(postalCode)) {
+        return res.render('auth/signup', { 
+            title: 'Sign up',
+            error: 'Please enter a valid postal code in format XXXX-XXX.' 
+        });
+    }
+
+    try {
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            return res.render('auth/signup', { 
+                title: 'Sign up',
+                error: 'Username already exists. Please choose another one.' 
+            });
+        }
+        
+        const existingEmail = await User.findOne({ email });
+        if (existingEmail) {
+            return res.render('auth/signup', { 
+                title: 'Sign up',
+                error: 'Email already registered. Please use another email or log in.' 
+            });
+        }
+        
+        const user = await User.create({
+            username, 
+            password, 
+            email, 
+            role, 
+            firstName, 
+            lastName, 
+            address: {
+                street,
+                city,
+                postalCode
+            }
+        });
+        
+        // Redirecionar para login com mensagem de sucesso
+        return res.render('auth/login', { 
+            title: 'Login',
+            success: 'Account created successfully! You can now log in.' 
+        });
+        
+    } catch (err) {
+        console.error('Error during signup:', err);
+        return res.render('auth/signup', { 
+            title: 'Sign up',
+            error: 'An error occurred during registration. Please try again.' 
+        });
     }
 
 }
@@ -44,23 +132,31 @@ authController.login = async function(req, res){
     const {username, password} = req.body
 
     if (!username || !password) {
-        return res.status(400).json({message: 'Username and password are required'})
+        return res.render('auth/login', {
+            title: 'Login', 
+            error: 'Username and password are required.'
+        })
     }
 
     try{
         const user = await User.findOne({username})
 
         if(!user){
-            return res.status(401).json({message: 'Username or password is invalid.'})
+            return res.render('auth/login', {
+                title: 'Login', 
+                error: 'Username or password is invalid.'
+            })
         }
 
         const passwordMatched = await bcrypt.compare(password, user.password)
-
         if(!passwordMatched){
-            return res.status(401).json({message: 'Username or password is invalid.'})
+            return res.render('auth/login', {
+                title: 'Login', 
+                error: 'Username or password is invalid.'
+            })
         }
 
-        const accessToken = jwt.sign({id: user._id, username: user.username, role: user.role}, process.env.JWT_SECRET, {expiresIn: '7d'}) 
+        const accessToken = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '7d'}) 
 
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
@@ -72,17 +168,28 @@ authController.login = async function(req, res){
         
         return res.redirect('/')
     } catch(err){
-        return res.status(400).json({message: err.message})
+        console.error('Login error:', err);
+        
+        return res.render('auth/login', {
+            title: 'Login',
+            error: 'An error occurred during login. Please try again.'
+        });
     }
 }
 
 authController.logout = function(req, res) {
-    res.clearCookie('accessToken', {
-        httpOnly: true,
-        sameSite: 'strict',
-    });
+    try {
+        res.clearCookie('accessToken', {
+            httpOnly: true,
+            sameSite: 'strict',
+        });
+        
+        return res.redirect('/auth/login');
+    } catch (err) {
+        console.error('Logout error:', err);
 
-    res.redirect('/auth/login');
+        return res.redirect('/auth/login');
+    }
 }
 
 module.exports = authController

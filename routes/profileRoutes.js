@@ -4,6 +4,6 @@ const verifyToken = require('../middleware/verifyToken');
 const profileController = require('../controllers/profileController')
 
 router.get('/', profileController.showProfile)
-router.get('/edit', profileController.editProfile)
+router.get('/edit', profileController.showEditProfile)
 
 module.exports = router;

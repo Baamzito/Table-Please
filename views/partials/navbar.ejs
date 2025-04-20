@@ -33,7 +33,7 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
               <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2 text-primary"></i>My Profile</a></li>
-              <% if (user.role == 'customer' || user.role == 'admin') { %>
+              <% if (user.role == 'restaurant' && user.validated || user.role == 'admin') { %>
                 <li><a class="dropdown-item" href="/profile"><i class="fas fa-gear me-2 text-primary"></i>Management</a></li>
               <% } %>
               <li><hr class="dropdown-divider"></li>
