@@ -10,9 +10,12 @@ const restaurantSchema = new mongoose.Schema({
     contact: {
         phone: { type: String, required: true,  },
         email: { type: String, match: /.+\@.+\..+/ },
-        website: { type: String, required: false }
     },
-
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    }
 },{ timestamps: true });
 
 
