@@ -116,19 +116,19 @@
             <div class="row mb-3">
               <div class="col-md-12 mb-3">
                 <label for="address_street" class="form-label">Street</label>
-                <input type="text" class="form-control" id="address_street" name="address[street]" 
+                <input type="text" class="form-control" id="address_street" name="address_street" 
                        value="<%= user.address && user.address.street ? user.address.street : '' %>">
               </div>
               
               <div class="col-md-6 mb-3">
                 <label for="address_city" class="form-label">City</label>
-                <input type="text" class="form-control" id="address_city" name="address[city]" 
+                <input type="text" class="form-control" id="address_city" name="address_city" 
                        value="<%= user.address && user.address.city ? user.address.city : '' %>">
               </div>
               
               <div class="col-md-6 mb-3">
                 <label for="address_postalCode" class="form-label">Postal Code</label>
-                <input type="text" class="form-control" id="address_postalCode" name="address[postalCode]" 
+                <input type="text" class="form-control" id="address_postalCode" name="address_postalCode" 
                        value="<%= user.address && user.address.postalCode ? user.address.postalCode : '' %>">
               </div>
             </div>

@@ -112,7 +112,6 @@ authController.signup = async function(req, res){
             }
         });
         
-        // Redirecionar para login com mensagem de sucesso
         return res.render('auth/login', { 
             title: 'Login',
             success: 'Account created successfully! You can now log in.' 
@@ -156,7 +155,7 @@ authController.login = async function(req, res){
             })
         }
 
-        const accessToken = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '7d'}) 
+        const accessToken = jwt.sign({id: user._id, username: user.username, role: user.role}, process.env.JWT_SECRET, {expiresIn: '7d'}) 
 
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
