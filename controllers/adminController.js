@@ -7,43 +7,31 @@ adminController.showDashboard = async function (req, res) {
     try {
         const userData = await User.findById(req.user.id)
         // Obter usuários com role restaurante que não estão validados
-        const pendingUsers = await User.find({
-            role: 'restaurant',
-            validated: false
-        }).sort({ createdAt: -1 });
-
-        // Obter contagem de restaurantes validados
-        const validatedCount = await User.countDocuments({
-            role: 'restaurant',
-            validated: true
-        });
-
-        // Obter contagem de restaurantes pendentes
-        const pendingCount = pendingUsers.length;
-
-        // Obter total de restaurantes
-        const totalRestaurantsCount = await User.countDocuments({ role: 'restaurant' });
-
-        // Obter restaurantes validados para o container de gestão
-        const validatedRestaurants = await Restaurant.find()
-            .populate('owner', 'firstName lastName username')
-            .sort({ name: 1 })
-            .limit(9); // Limitando a 9 para a exibição em grid
-
+        const pendingUsers = await User.find({ role: 'restaurant', validated: false }).sort({ createdAt: -1 });
+        // Obter contagem de usuários com role restaurante validados
+        const validatedUsersCount = await User.countDocuments({ role: 'restaurant', validated: true });
+        // Obter contagem de usuários com role restaurante pendentes
+        const pendingUsersCount = pendingUsers.length;
+        // Obter total de usuários com role restaurante
+        const totalRestaurantUsersCount = await User.countDocuments({ role: 'restaurant' });
+        
+        // Dados relacionados aos restaurantes em si (não os usuários)
+        // Obter contagem total de restaurantes
+        const totalRestaurantsCount = await Restaurant.countDocuments();
+        // Obter restaurantes para o container de gestão
+        const restaurantsList = await Restaurant.find().populate('owner', 'firstName lastName username profileImage').sort({ name: 1 }).limit(9);
         // Obter usuários com role restaurante para o dropdown de adicionar restaurante
-        const restaurantOwners = await User.find({
-            role: 'restaurant',
-            validated: true
-        }).select('firstName lastName username');
+        const restaurantOwners = await User.find({ role: 'restaurant', validated: true }).select('firstName lastName username');
 
         res.render('admin/dashboard', {
             title: 'Dashboard',
             admin: userData,
             pendingUsers,
-            validatedCount,
-            pendingCount,
+            validatedUsersCount,
+            pendingUsersCount,
+            totalRestaurantUsersCount,
             totalRestaurantsCount,
-            validatedRestaurants,
+            restaurantsList,
             restaurantOwners
         });
 
@@ -66,31 +54,15 @@ adminController.validateUser = async function (req, res) {
         if (!user) {
             return res.render('admin/dashboard', {
                 error: 'User not found',
-                // Include all the other data needed for the dashboard
                 title: 'Dashboard',
                 admin: req.user,
-                // Fetch all needed data again
-                pendingUsers: await User.find({
-                    role: 'restaurant',
-                    validated: false
-                }).sort({ createdAt: -1 }),
-                validatedCount: await User.countDocuments({
-                    role: 'restaurant',
-                    validated: true
-                }),
-                pendingCount: await User.countDocuments({
-                    role: 'restaurant',
-                    validated: false
-                }),
-                totalRestaurantsCount: await User.countDocuments({ role: 'restaurant' }),
-                validatedRestaurants: await Restaurant.find()
-                    .populate('owner', 'firstName lastName username')
-                    .sort({ name: 1 })
-                    .limit(9),
-                restaurantOwners: await User.find({
-                    role: 'restaurant',
-                    validated: true
-                }).select('firstName lastName username')
+                pendingUsers: await User.find({ role: 'restaurant', validated: false }).sort({ createdAt: -1 }),
+                validatedUsersCount: await User.countDocuments({ role: 'restaurant', validated: true }),
+                pendingUsersCount: await User.countDocuments({ role: 'restaurant', validated: false }),
+                totalRestaurantUsersCount: await User.countDocuments({ role: 'restaurant' }),
+                totalRestaurantsCount: await Restaurant.countDocuments(),
+                restaurantsList: await Restaurant.find().populate('owner', 'firstName lastName username profileImage').sort({ name: 1 }).limit(9),
+                restaurantOwners: await User.find({ role: 'restaurant', validated: true }).select('firstName lastName username')
             });
         }
 
@@ -100,34 +72,23 @@ adminController.validateUser = async function (req, res) {
                 // Include all the other data needed for the dashboard
                 title: 'Dashboard',
                 admin: req.user,
-                // Fetch all needed data again
-                pendingUsers: await User.find({
-                    role: 'restaurant',
-                    validated: false
-                }).sort({ createdAt: -1 }),
-                validatedCount: await User.countDocuments({
-                    role: 'restaurant',
-                    validated: true
-                }),
-                pendingCount: await User.countDocuments({
-                    role: 'restaurant',
-                    validated: false
-                }),
-                totalRestaurantsCount: await User.countDocuments({ role: 'restaurant' }),
-                validatedRestaurants: await Restaurant.find()
-                    .populate('owner', 'firstName lastName username')
-                    .sort({ name: 1 })
-                    .limit(9),
-                restaurantOwners: await User.find({
-                    role: 'restaurant',
-                    validated: true
-                }).select('firstName lastName username')
+                pendingUsers: await User.find({ role: 'restaurant', validated: false }).sort({ createdAt: -1 }),
+                validatedUsersCount: await User.countDocuments({ role: 'restaurant', validated: true }),
+                pendingUsersCount: await User.countDocuments({ role: 'restaurant', validated: false }),
+                totalRestaurantUsersCount: await User.countDocuments({ role: 'restaurant' }),
+                totalRestaurantsCount: await Restaurant.countDocuments(),
+                restaurantsList: await Restaurant.find().populate('owner', 'firstName lastName username profileImage').sort({ name: 1 }).limit(9),
+                restaurantOwners: await User.find({ role: 'restaurant', validated: true }).select('firstName lastName username')
             });
         }
 
-        // Atualizar usuário para status validado
-        user.validated = true;
-        await user.save();
+        await User.findByIdAndUpdate(userId, { validated: true });
+
+        const pendingUsers = await User.find({role: 'restaurant',validated: false}).sort({ createdAt: -1 });
+        const validatedUsersCount = await User.countDocuments({role: 'restaurant',validated: true});
+        const pendingUsersCount = pendingUsers.length;
+        const restaurantsList = await Restaurant.find().populate('owner', 'firstName lastName username profileImage').sort({ name: 1 }).limit(9);
+        const restaurantOwners = await User.find({role: 'restaurant',validated: true}).select('firstName lastName username');
 
         // Mensagem de sucesso e redirecionamento
         res.render('admin/dashboard', {
@@ -135,20 +96,12 @@ adminController.validateUser = async function (req, res) {
             title: 'Dashboard',
             admin: req.user,
             pendingUsers,
-            validatedCount: await User.countDocuments({
-                role: 'restaurant',
-                validated: true
-            }),
-            pendingCount: pendingUsers.length,
-            totalRestaurantsCount: await User.countDocuments({ role: 'restaurant' }),
-            validatedRestaurants: await Restaurant.find()
-                .populate('owner', 'firstName lastName username')
-                .sort({ name: 1 })
-                .limit(9),
-            restaurantOwners: await User.find({
-                role: 'restaurant',
-                validated: true
-            }).select('firstName lastName username')
+            validatedUsersCount,
+            pendingUsersCount,
+            totalRestaurantUsersCount: await User.countDocuments({ role: 'restaurant' }),
+            totalRestaurantsCount: await Restaurant.countDocuments(),
+            restaurantsList,
+            restaurantOwners
         });
 
     } catch (error) {
@@ -159,16 +112,23 @@ adminController.validateUser = async function (req, res) {
 
 adminController.addRestaurant = async function (req, res) {
     try {
-        const { name, owner, description } = req.body;
-        const address = req.body.address;
 
         // Criar novo restaurante
         const newRestaurant = new Restaurant({
-            name,
-            owner,
-            description,
-            address
+            name: req.body.name,
+            address: {
+                street: req.body.address_street,
+                city: req.body.address_city,
+                postcode: req.body.address_postcode
+            },
+            contact: {
+                phone: req.body.contact_phone,
+                email: req.body.contact_email || ""
+            },
+            owner: req.body.owner,
         });
+
+        console.log(newRestaurant)
 
         await newRestaurant.save();
 
@@ -176,27 +136,13 @@ adminController.addRestaurant = async function (req, res) {
             success: 'Restaurant added successfully',
             title: 'Dashboard',
             admin: req.user,
-            pendingUsers: await User.find({
-                role: 'restaurant',
-                validated: false
-            }).sort({ createdAt: -1 }),
-            validatedCount: await User.countDocuments({
-                role: 'restaurant',
-                validated: true
-            }),
-            pendingCount: await User.countDocuments({
-                role: 'restaurant',
-                validated: false
-            }),
-            totalRestaurantsCount: await User.countDocuments({ role: 'restaurant' }),
-            validatedRestaurants: await Restaurant.find()
-                .populate('owner', 'firstName lastName username')
-                .sort({ name: 1 })
-                .limit(9),
-            restaurantOwners: await User.find({
-                role: 'restaurant',
-                validated: true
-            }).select('firstName lastName username')
+            pendingUsers: await User.find({ role: 'restaurant', validated: false }).sort({ createdAt: -1 }),
+            validatedUsersCount: await User.countDocuments({ role: 'restaurant', validated: true }),
+            pendingUsersCount: await User.countDocuments({ role: 'restaurant', validated: false }),
+            totalRestaurantUsersCount: await User.countDocuments({ role: 'restaurant' }),
+            totalRestaurantsCount: await Restaurant.countDocuments(),
+            restaurantsList: await Restaurant.find().populate('owner', 'firstName lastName username profileImage').sort({ name: 1 }).limit(9),
+            restaurantOwners: await User.find({ role: 'restaurant', validated: true }).select('firstName lastName username')
         });
 
     } catch (error) {
@@ -219,27 +165,13 @@ adminController.editRestaurant = async function (req, res) {
                 error: 'Restaurant not found',
                 title: 'Dashboard',
                 admin: req.user,
-                pendingUsers: await User.find({
-                    role: 'restaurant',
-                    validated: false
-                }).sort({ createdAt: -1 }),
-                validatedCount: await User.countDocuments({
-                    role: 'restaurant',
-                    validated: true
-                }),
-                pendingCount: await User.countDocuments({
-                    role: 'restaurant',
-                    validated: false
-                }),
-                totalRestaurantsCount: await User.countDocuments({ role: 'restaurant' }),
-                validatedRestaurants: await Restaurant.find()
-                    .populate('owner', 'firstName lastName username')
-                    .sort({ name: 1 })
-                    .limit(9),
-                restaurantOwners: await User.find({
-                    role: 'restaurant',
-                    validated: true
-                }).select('firstName lastName username')
+                pendingUsers: await User.find({ role: 'restaurant', validated: false }).sort({ createdAt: -1 }),
+                validatedUsersCount: await User.countDocuments({ role: 'restaurant', validated: true }),
+                pendingUsersCount: await User.countDocuments({ role: 'restaurant', validated: false }),
+                totalRestaurantUsersCount: await User.countDocuments({ role: 'restaurant' }),
+                totalRestaurantsCount: await Restaurant.countDocuments(),
+                restaurantsList: await Restaurant.find().populate('owner', 'firstName lastName username profileImage').sort({ name: 1 }).limit(9),
+                restaurantOwners: await User.find({ role: 'restaurant', validated: true }).select('firstName lastName username')
             });
         }
 
@@ -253,27 +185,13 @@ adminController.editRestaurant = async function (req, res) {
             success: 'Restaurant updated successfully',
             title: 'Dashboard',
             admin: req.user,
-            pendingUsers: await User.find({
-                role: 'restaurant',
-                validated: false
-            }).sort({ createdAt: -1 }),
-            validatedCount: await User.countDocuments({
-                role: 'restaurant',
-                validated: true
-            }),
-            pendingCount: await User.countDocuments({
-                role: 'restaurant',
-                validated: false
-            }),
-            totalRestaurantsCount: await User.countDocuments({ role: 'restaurant' }),
-            validatedRestaurants: await Restaurant.find()
-                .populate('owner', 'firstName lastName username')
-                .sort({ name: 1 })
-                .limit(9),
-            restaurantOwners: await User.find({
-                role: 'restaurant',
-                validated: true
-            }).select('firstName lastName username')
+            pendingUsers: await User.find({ role: 'restaurant', validated: false }).sort({ createdAt: -1 }),
+            validatedUsersCount: await User.countDocuments({ role: 'restaurant', validated: true }),
+            pendingUsersCount: await User.countDocuments({ role: 'restaurant', validated: false }),
+            totalRestaurantUsersCount: await User.countDocuments({ role: 'restaurant' }),
+            totalRestaurantsCount: await Restaurant.countDocuments(),
+            restaurantsList: await Restaurant.find().populate('owner', 'firstName lastName username profileImage').sort({ name: 1 }).limit(9),
+            restaurantOwners: await User.find({ role: 'restaurant', validated: true }).select('firstName lastName username')
         });
 
     } catch (error) {
@@ -292,27 +210,13 @@ adminController.deleteRestaurant = async function (req, res) {
             success: 'Restaurant removed successfully',
             title: 'Dashboard',
             admin: req.user,
-            pendingUsers: await User.find({
-                role: 'restaurant',
-                validated: false
-            }).sort({ createdAt: -1 }),
-            validatedCount: await User.countDocuments({
-                role: 'restaurant',
-                validated: true
-            }),
-            pendingCount: await User.countDocuments({
-                role: 'restaurant',
-                validated: false
-            }),
-            totalRestaurantsCount: await User.countDocuments({ role: 'restaurant' }),
-            validatedRestaurants: await Restaurant.find()
-                .populate('owner', 'firstName lastName username')
-                .sort({ name: 1 })
-                .limit(9),
-            restaurantOwners: await User.find({
-                role: 'restaurant',
-                validated: true
-            }).select('firstName lastName username')
+            pendingUsers: await User.find({ role: 'restaurant', validated: false }).sort({ createdAt: -1 }),
+            validatedUsersCount: await User.countDocuments({ role: 'restaurant', validated: true }),
+            pendingUsersCount: await User.countDocuments({ role: 'restaurant', validated: false }),
+            totalRestaurantUsersCount: await User.countDocuments({ role: 'restaurant' }),
+            totalRestaurantsCount: await Restaurant.countDocuments(),
+            restaurantsList: await Restaurant.find().populate('owner', 'firstName lastName username profileImage').sort({ name: 1 }).limit(9),
+            restaurantOwners: await User.find({ role: 'restaurant', validated: true }).select('firstName lastName username')
         });
 
     } catch (error) {
@@ -323,18 +227,18 @@ adminController.deleteRestaurant = async function (req, res) {
 
 adminController.getValidatedRestaurants = async function (req, res) {
     try {
-        const validatedRestaurants = await Restaurant.find()
+        const restaurantsList = await Restaurant.find()
             .populate('owner', 'firstName lastName username')
             .sort({ name: 1 });
 
         res.render('admin/restaurants', {
-            title: 'Validated Restaurants',
+            title: 'All Restaurants',
             admin: req.user,
-            restaurants: validatedRestaurants
+            restaurants: restaurantsList
         });
 
     } catch (error) {
-        console.error('Erro ao obter restaurantes validados:', error);
+        console.error('Erro ao obter restaurantes:', error);
         res.redirect('/admin/dashboard');
     }
 }
