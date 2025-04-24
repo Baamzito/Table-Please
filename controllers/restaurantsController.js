@@ -1,12 +1,13 @@
 const Restaurant = require('../models/restaurant')
+const User = require('../models/user');
 
 const restaurantsController = {}
 
 restaurantsController.showRestaurants = async function(req, res){
     try{
+        const userData = await User.findById(req.user.id);
         const restaurants = await Restaurant.find()
-        console.log(restaurants)
-        res.render('restaurants/restaurants', { title: 'Restaurants', restaurants: restaurants })
+        res.render('restaurants/restaurants', { title: 'Restaurants', restaurants: restaurants, user: userData})
     } catch(err){
         res.status(500).json({message: 'Error loading restaurants'})
     }   
