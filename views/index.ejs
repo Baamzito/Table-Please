@@ -7,10 +7,10 @@
     <div class="row min-vh-75 align-items-center pt-5">
       <div class="col-lg-8 mx-auto text-center">
         <h1 class="display-4 text-white fw-bold mb-3">
-          Discover the Perfect Restaurant
+          Find the Perfect Restaurant
         </h1>
         <p class="lead text-white mb-4">
-          Find the best places to eat based on cuisine, location, and reviews
+          Locate the best places to eat in your area
         </p>
 
         <div
@@ -27,8 +27,8 @@
                   <input
                     type="text"
                     class="form-control border-0"
-                    name="keyword"
-                    placeholder="Restaurant name or cuisine type"
+                    name="name"
+                    placeholder="Restaurant name"
                   />
                 </div>
               </div>
@@ -40,8 +40,8 @@
                   <input
                     type="text"
                     class="form-control border-0"
-                    name="location"
-                    placeholder="Location"
+                    name="city"
+                    placeholder="City"
                   />
                 </div>
               </div>
@@ -65,7 +65,7 @@
       <div class="col-12">
         <h2 class="text-center mb-4">Featured Restaurants</h2>
         <p class="text-center text-muted">
-          Discover our users' top picks and newest additions
+          Discover the most popular establishments on our platform
         </p>
       </div>
     </div>
@@ -76,30 +76,32 @@
       <div class="col-md-6 col-lg-4 mb-4">
         <div class="card h-100 shadow-sm hover-card">
           <img
-            src="<%= restaurant.imageUrl %>"
+            src="<%= restaurant.imageUrl || '/images/default-restaurant.jpg' %>"
             class="card-img-top restaurant-img"
             alt="<%= restaurant.name %>"
           />
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <h5 class="card-title mb-0"><%= restaurant.name %></h5>
+              <% if(restaurant.rating) { %>
               <span class="badge bg-primary rounded-pill">
-                <i class="fas fa-star me-1"></i><%= restaurant.rating.toFixed(1)
-                %>
+                <i class="fas fa-star me-1"></i><%= restaurant.rating.toFixed(1) %>
               </span>
+              <% } %>
             </div>
             <p class="text-muted small mb-1">
-              <i class="fas fa-utensils me-2"></i><%= restaurant.cuisine %>
+              <i class="fas fa-map-marker-alt me-2"></i><%= restaurant.address.city %>
             </p>
             <p class="text-muted small mb-2">
-              <i class="fas fa-map-marker-alt me-2"></i><%= restaurant.location
-              %>
+              <i class="fas fa-phone me-2"></i><%= restaurant.contact.phone %>
             </p>
-            <p class="card-text text-truncate"><%= restaurant.description %></p>
+            <p class="text-muted small mb-2">
+              <i class="fas fa-envelope me-2"></i><%= restaurant.contact.email || 'N/A' %>
+            </p>
           </div>
           <div class="card-footer bg-white border-top-0">
             <a
-              href="/restaurants/<%= restaurant.id %>"
+              href="/restaurants/<%= restaurant._id %>"
               class="btn btn-outline-primary btn-sm"
               >View Details</a
             >
@@ -124,44 +126,6 @@
   </div>
 </section>
 
-<!-- Popular Cuisines -->
-<section class="py-5 w-100 vw-100">
-  <div class="container-fluid px-lg-5">
-    <div class="row mb-4">
-      <div class="col-12">
-        <h2 class="text-center mb-4">Popular Cuisines</h2>
-        <p class="text-center text-muted">
-          Explore restaurants by your favorite cuisine types
-        </p>
-      </div>
-    </div>
-
-    <div class="row justify-content-center px-3 px-lg-5">
-      <% const cuisines = locals.popularCuisines || [ {name: 'Italian', icon:
-      'fa-pizza-slice', count: 42}, {name: 'Japanese', icon: 'fa-fish', count:
-      38}, {name: 'American', icon: 'fa-burger', count: 35}, {name: 'Mexican',
-      icon: 'fa-pepper-hot', count: 29}, {name: 'Indian', icon: 'fa-bowl-food',
-      count: 24}, {name: 'Chinese', icon: 'fa-bowl-rice', count: 22} ]; %> <%
-      cuisines.forEach(cuisine => { %>
-      <div class="col-6 col-md-4 col-lg-2 mb-4">
-        <a
-          href="/restaurants/cuisine/<%= cuisine.name.toLowerCase() %>"
-          class="text-decoration-none"
-        >
-          <div class="card text-center cuisine-card h-100 shadow-sm">
-            <div class="card-body py-4">
-              <i class="fas <%= cuisine.icon %> cuisine-icon mb-3"></i>
-              <h5 class="card-title mb-1"><%= cuisine.name %></h5>
-              <p class="text-muted small"><%= cuisine.count %> restaurants</p>
-            </div>
-          </div>
-        </a>
-      </div>
-      <% }); %>
-    </div>
-  </div>
-</section>
-
 <!-- How It Works -->
 <section class="py-5 bg-light w-100 vw-100">
   <div class="container-fluid px-lg-5">
@@ -169,7 +133,7 @@
       <div class="col-12">
         <h2 class="text-center mb-4">How It Works</h2>
         <p class="text-center text-muted">
-          Finding your perfect dining experience is simple
+          Finding your perfect restaurant is simple
         </p>
       </div>
     </div>
@@ -183,8 +147,7 @@
             </div>
             <h4>Search</h4>
             <p class="text-muted">
-              Enter your location and preferred cuisine to find restaurants near
-              you.
+              Enter the restaurant name or city to find options near you.
             </p>
           </div>
         </div>
@@ -194,11 +157,11 @@
         <div class="card h-100 shadow-sm text-center border-0 bg-transparent">
           <div class="card-body">
             <div class="icon-circle bg-primary text-white mx-auto mb-4">
-              <i class="fas fa-star"></i>
+              <i class="fas fa-info-circle"></i>
             </div>
-            <h4>Compare</h4>
+            <h4>Get Informed</h4>
             <p class="text-muted">
-              Check ratings, reviews, menus, and photos to make the best choice.
+              Check contact details and address to make the best choice.
             </p>
           </div>
         </div>
@@ -212,8 +175,7 @@
             </div>
             <h4>Enjoy</h4>
             <p class="text-muted">
-              Dine at your chosen restaurant and share your experience with
-              others.
+              Visit your chosen restaurant and share your experience.
             </p>
           </div>
         </div>
@@ -222,22 +184,5 @@
   </div>
 </section>
 
-<!-- Join Community -->
-<section class="py-5 bg-primary text-white w-100 vw-100">
-  <div class="container-fluid px-lg-5">
-    <div class="row align-items-center px-3 px-lg-5">
-      <div class="col-lg-8 mb-4 mb-lg-0">
-        <h2>Join Our Community of Food Lovers</h2>
-        <p class="lead mb-0">
-          Create an account to save favorites, write reviews, and get
-          personalized recommendations.
-        </p>
-      </div>
-      <div class="col-lg-4 text-lg-end">
-        <a href="/auth/signup" class="btn btn-light btn-lg">Sign Up Now</a>
-      </div>
-    </div>
-  </div>
-</section>
 <%- include('partials/footer') %>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

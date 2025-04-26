@@ -6,21 +6,12 @@ let adminController = {}
 adminController.showDashboard = async function (req, res) {
     try {
         const userData = await User.findById(req.user.id)
-        // Obter usuários com role restaurante que não estão validados
         const pendingUsers = await User.find({ role: 'restaurant', validated: false }).sort({ createdAt: -1 });
-        // Obter contagem de usuários com role restaurante validados
         const validatedUsersCount = await User.countDocuments({ role: 'restaurant', validated: true });
-        // Obter contagem de usuários com role restaurante pendentes
         const pendingUsersCount = pendingUsers.length;
-        // Obter total de usuários com role restaurante
         const totalRestaurantUsersCount = await User.countDocuments({ role: 'restaurant' });
-        
-        // Dados relacionados aos restaurantes em si (não os usuários)
-        // Obter contagem total de restaurantes
         const totalRestaurantsCount = await Restaurant.countDocuments();
-        // Obter restaurantes para o container de gestão
         const restaurantsList = await Restaurant.find().populate('owner', 'firstName lastName username profileImage').sort({ name: 1 }).limit(9);
-        // Obter usuários com role restaurante para o dropdown de adicionar restaurante
         const restaurantOwners = await User.find({ role: 'restaurant', validated: true }).select('firstName lastName username');
 
         res.render('admin/dashboard', {
@@ -48,7 +39,6 @@ adminController.validateUser = async function (req, res) {
     try {
         const userId = req.params.id;
 
-        // Encontrar o usuário pelo ID
         const user = await User.findById(userId);
 
         if (!user) {
@@ -69,7 +59,6 @@ adminController.validateUser = async function (req, res) {
         if (user.role !== 'restaurant') {
             return res.render('admin/dashboard', {
                 error: 'Only users with restaurant role can be validated',
-                // Include all the other data needed for the dashboard
                 title: 'Dashboard',
                 admin: req.user,
                 pendingUsers: await User.find({ role: 'restaurant', validated: false }).sort({ createdAt: -1 }),
@@ -90,7 +79,6 @@ adminController.validateUser = async function (req, res) {
         const restaurantsList = await Restaurant.find().populate('owner', 'firstName lastName username profileImage').sort({ name: 1 }).limit(9);
         const restaurantOwners = await User.find({role: 'restaurant',validated: true}).select('firstName lastName username');
 
-        // Mensagem de sucesso e redirecionamento
         res.render('admin/dashboard', {
             success: `${user.firstName} ${user.lastName} was validated successfully`,
             title: 'Dashboard',
@@ -113,7 +101,6 @@ adminController.validateUser = async function (req, res) {
 adminController.addRestaurant = async function (req, res) {
     try {
 
-        // Criar novo restaurante
         const newRestaurant = new Restaurant({
             name: req.body.name,
             address: {
@@ -157,7 +144,6 @@ adminController.editRestaurant = async function (req, res) {
         const { name, description } = req.body;
         const address = req.body.address;
 
-        // Encontrar e atualizar o restaurante
         const restaurant = await Restaurant.findById(restaurantId);
 
         if (!restaurant) {

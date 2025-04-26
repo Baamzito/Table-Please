@@ -8,7 +8,7 @@ router.get('/dashboard', authorizedRole('admin'), adminController.showDashboard)
 // Validação de restaurantes
 router.post('/validate-user/:id', adminController.validateUser);
 
-// Gestão de restaurantes
+// Gestão dos restaurantes
 router.post('/add-restaurant', adminController.addRestaurant);
 router.post('/edit-restaurant/:id', adminController.editRestaurant);
 router.post('/delete-restaurant/:id', adminController.deleteRestaurant);

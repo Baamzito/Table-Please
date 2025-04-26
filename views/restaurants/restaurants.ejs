@@ -26,8 +26,8 @@
                   <input
                     type="text"
                     class="form-control border-0"
-                    name="keyword"
-                    placeholder="Restaurant name or cuisine"
+                    name="name"
+                    placeholder="Restaurant name"
                   />
                 </div>
               </div>
@@ -39,8 +39,8 @@
                   <input
                     type="text"
                     class="form-control border-0"
-                    name="location"
-                    placeholder="Location"
+                    name="city"
+                    placeholder="City"
                   />
                 </div>
               </div>
@@ -68,13 +68,6 @@
       </div>
       <div class="col-md-6">
         <div class="d-flex justify-content-md-end">
-          <div class="me-3">
-            <select class="form-select form-select-sm" id="sortSelect">
-              <option value="rating">Sort by Rating</option>
-              <option value="name">Sort by Name</option>
-              <option value="price">Sort by Price</option>
-            </select>
-          </div>
           <div class="btn-group" role="group">
             <button
               type="button"
@@ -134,28 +127,21 @@
                 </span>
                 <% } %>
               </div>
-              <p class="text-muted small mb-1">
-                <% if(restaurant.cuisine) { %>
-                <i class="fas fa-utensils me-2"></i><%= restaurant.cuisine %>
-                <% } %>
-              </p>
               <p class="text-muted small mb-2">
                 <i class="fas fa-map-marker-alt me-2"></i>
-                <%= restaurant.address || restaurant.location || 'Address not available' %>
+                <%= restaurant.address ? `${restaurant.address.street}, ${restaurant.address.city}, ${restaurant.address.postcode}` : 'Address not available' %>
               </p>
-              <% if(restaurant.description) { %>
-              <p class="card-text text-truncate"><%= restaurant.description %></p>
-              <% } %>
+              <p class="text-muted small mb-2">
+                <i class="fas fa-phone me-2"></i>
+                <%= restaurant.contact && restaurant.contact.phone ? restaurant.contact.phone : 'Phone not available' %>
+              </p>
+              <p class="text-muted small mb-2">
+                <i class="fas fa-envelope me-2"></i>
+                <%= restaurant.contact && restaurant.contact.email ? restaurant.contact.email : 'Email not available' %>
+              </p>
             </div>
             <div class="card-footer bg-white border-top-0">
-              <div class="d-flex justify-content-between align-items-center">
-                <% if(restaurant.priceRange) { %>
-                <div class="text-muted">
-                  <% for(let i = 0; i < restaurant.priceRange; i++) { %>
-                  <i class="fas fa-dollar-sign"></i>
-                  <% } %>
-                </div>
-                <% } %>
+              <div class="d-flex justify-content-end align-items-center">
                 <a
                   href="/restaurants/<%= restaurant._id %>"
                   class="btn btn-outline-primary btn-sm"
@@ -174,7 +160,7 @@
         <div class="list-group">
           <% restaurants.forEach(restaurant => { %>
           <a
-            href="/restaurants/<%= restaurant._id || restaurant.id %>"
+            href="/restaurants/<%= restaurant._id %>"
             class="list-group-item list-group-item-action mb-2 shadow-sm"
           >
             <div class="row align-items-center">
@@ -193,29 +179,18 @@
               </div>
               <div class="col-md-7">
                 <h5 class="mb-1"><%= restaurant.name %></h5>
-                <div class="mb-1">
-                  <% if(restaurant.cuisine) { %>
-                  <span class="badge bg-light text-dark me-2">
-                    <i class="fas fa-utensils me-1"></i><%= restaurant.cuisine %>
-                  </span>
-                  <% } %> 
-                  <% if(restaurant.priceRange) { %>
-                  <span class="badge bg-light text-dark">
-                    <% for(let i = 0; i < restaurant.priceRange; i++) { %>
-                    <i class="fas fa-dollar-sign"></i>
-                    <% } %>
-                  </span>
-                  <% } %>
-                </div>
                 <p class="text-muted small mb-1">
                   <i class="fas fa-map-marker-alt me-1"></i>
-                  <%= restaurant.address || restaurant.location || 'Address not available' %>
+                  <%= restaurant.address ? `${restaurant.address.street}, ${restaurant.address.city}, ${restaurant.address.postcode}` : 'Address not available' %>
                 </p>
-                <% if(restaurant.description) { %>
-                <p class="small text-muted text-truncate">
-                  <%= restaurant.description %>
+                <p class="text-muted small mb-1">
+                  <i class="fas fa-phone me-1"></i>
+                  <%= restaurant.contact && restaurant.contact.phone ? restaurant.contact.phone : 'Phone not available' %>
                 </p>
-                <% } %>
+                <p class="text-muted small mb-1">
+                  <i class="fas fa-envelope me-1"></i>
+                  <%= restaurant.contact && restaurant.contact.email ? restaurant.contact.email : 'Email not available' %>
+                </p>
               </div>
               <div class="col-md-3 text-md-end">
                 <% if(restaurant.rating) { %>
@@ -266,68 +241,6 @@
   </div>
 </section>
 
-<!-- Popular Cuisines -->
-<section class="py-5 bg-light w-100">
-  <div class="container-fluid px-lg-5">
-    <div class="row mb-4">
-      <div class="col-12">
-        <h2 class="text-center mb-4">Popular Cuisines</h2>
-        <p class="text-center text-muted">
-          Explore restaurants by your favorite cuisine types
-        </p>
-      </div>
-    </div>
-
-    <div class="row justify-content-center px-3 px-lg-5">
-      <% 
-      const cuisines = [
-        {name: 'Italian', icon: 'fa-pizza-slice', count: 42}, 
-        {name: 'Japanese', icon: 'fa-fish', count: 38}, 
-        {name: 'American', icon: 'fa-burger', count: 35}, 
-        {name: 'Mexican', icon: 'fa-pepper-hot', count: 29}, 
-        {name: 'Indian', icon: 'fa-bowl-food', count: 24}, 
-        {name: 'Chinese', icon: 'fa-bowl-rice', count: 22}
-      ]; 
-      %>
-      
-      <% cuisines.forEach(cuisine => { %>
-      <div class="col-6 col-md-4 col-lg-2 mb-4">
-        <a
-          href="/restaurants/cuisine/<%= cuisine.name.toLowerCase() %>"
-          class="text-decoration-none"
-        >
-          <div class="card text-center cuisine-card h-100 shadow-sm">
-            <div class="card-body py-4">
-              <i class="fas <%= cuisine.icon %> cuisine-icon mb-3"></i>
-              <h5 class="card-title mb-1"><%= cuisine.name %></h5>
-              <p class="text-muted small"><%= cuisine.count %> restaurants</p>
-            </div>
-          </div>
-        </a>
-      </div>
-      <% }); %>
-    </div>
-  </div>
-</section>
-
-<!-- Join Community -->
-<section class="py-5 bg-primary text-white w-100">
-  <div class="container-fluid px-lg-5">
-    <div class="row align-items-center px-3 px-lg-5">
-      <div class="col-lg-8 mb-4 mb-lg-0">
-        <h2>Join Our Community of Food Lovers</h2>
-        <p class="lead mb-0">
-          Create an account to save favorites, write reviews, and get
-          personalized recommendations.
-        </p>
-      </div>
-      <div class="col-lg-4 text-lg-end">
-        <a href="/auth/signup" class="btn btn-light btn-lg">Sign Up Now</a>
-      </div>
-    </div>
-  </div>
-</section>
-
 <%- include('../partials/footer') %>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -347,9 +260,4 @@
     document.getElementById("gridViewBtn").classList.remove("active");
   });
 
-  // Implementação básica de ordenação (seria substituída por chamadas ao servidor)
-  document.getElementById("sortSelect").addEventListener("change", function () {
-    // Aqui você implementaria a lógica real de ordenação
-    console.log("Ordenar por:", this.value);
-  });
 </script>

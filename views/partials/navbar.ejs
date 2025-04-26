@@ -1,42 +1,35 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm mb-2">
   <div class="container">
-    <!-- Logo -->
     <a class="navbar-brand d-flex align-items-center" href="/">
       <img src="/images/logo.png" class="navbar-logo" width="120" height="45">
     </a>
-    
-    <!-- Botão de menu mobile -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" 
             aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    
-    <!-- Conteúdo do menu -->
+
     <div class="collapse navbar-collapse" id="navbarContent">
-      <!-- Links de navegação -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
           <a class="nav-link" href="/restaurants/">Restaurants</a>
         </li>
       </ul>
       
-      <!-- Autenticação -->
       <div class="d-flex align-items-center">
         <% if (locals.user) { %>
-          <!-- Usuário logado -->
           <div class="dropdown">
             <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" type="button" id="userMenuDropdown" 
                    data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="<%= user.profileImage || '/images/default-avatar.jpg' %>" alt="Perfil" 
+              <img src="<%= locals.user.profileImage || '/images/default-avatar.jpg' %>" alt="Perfil" 
                    class="rounded-circle me-2" width="30" height="30">
-              <span><%= user.username %></span>
+              <span><%= locals.user.username %></span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
               <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2 text-primary"></i>My Profile</a></li>
-              <% if (user.role == 'admin') { %>
+              <% if (locals.user.role == 'admin') { %>
                 <li><a class="dropdown-item" href="/admin/dashboard"><i class="fas fa-chart-bar me-2 text-primary"></i>Dashboard</a></li>
               <% } %>
-              <% if (user.role == 'restaurant' && user.validated || user.role == 'admin') { %>
+              <% if (locals.user.role == 'restaurant' && locals.user.validated) { %>
                 <li><a class="dropdown-item" href="/owner/my-restaurants"><i class="fas fa-gear me-2 text-primary"></i>My Restaurants</a></li>
               <% } %>
               <li><hr class="dropdown-divider"></li>
@@ -44,7 +37,6 @@
             </ul>
           </div>
         <% } else { %>
-          <!-- Usuário não logado -->
           <a href="/auth/login" class="btn btn-outline-primary me-2">Login</a>
           <a href="/auth/signup" class="btn btn-primary me-2">Sign up</a>
         <% } %>

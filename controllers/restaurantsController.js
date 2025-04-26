@@ -1,13 +1,14 @@
 const Restaurant = require('../models/restaurant')
+const Menu = require('../models/menu')
+const MenuItem = require('../models/menuItem')
 const User = require('../models/user');
 
 const restaurantsController = {}
 
 restaurantsController.showRestaurants = async function(req, res){
     try{
-        const userData = await User.findById(req.user.id);
         const restaurants = await Restaurant.find()
-        res.render('restaurants/restaurants', { title: 'Restaurants', restaurants: restaurants, user: userData})
+        res.render('restaurants/restaurants', { title: 'Restaurants', restaurants: restaurants })
     } catch(err){
         res.status(500).json({message: 'Error loading restaurants'})
     }   
@@ -16,87 +17,61 @@ restaurantsController.showRestaurants = async function(req, res){
 restaurantsController.showRestaurantDetails = async function(req, res) {
     try {
         const restaurantId = req.params.id;
-        
+       
         const restaurant = await Restaurant.findById(restaurantId).lean();
-        
+       
         if (!restaurant) {
-            return res.status(404).render('error', { 
+            return res.status(404).render('error', {
                 message: 'Restaurante não encontrado'
             });
         }
-        
-        return res.render('restaurants/restaurantDetails', { restaurant });
-        
+       
+        const menus = await Menu.find({ restaurantId: restaurantId, active: true }).lean();
+
+        const menuIds = menus.map(menu => menu._id);
+        const menuItems = await MenuItem.find({ menuId: { $in: menuIds } }).lean();
+       
+        for (const menu of menus) {
+            menu.items = menuItems.filter(item => 
+                item.menuId.toString() === menu._id.toString()
+            );
+        }
+       
+        return res.render('restaurants/restaurantDetails', {
+            title: restaurant.name,
+            restaurant,
+            menus,
+            menuItems
+        });
+       
     } catch (err) {
         console.error('Erro ao buscar detalhes do restaurante:', err);
-        return res.status(500).render('error', { 
+        return res.status(500).render('error', {
             message: 'Não foi possível carregar os detalhes do restaurante',
             error: process.env.NODE_ENV === 'development' ? err : {}
         });
     }
 }
 
-restaurantsController.showCreateRestaurant = function(req, res) {
-    res.render('restaurants/create');
+restaurantsController.searchRestaurants = async function(req, res){
+    const { name, city } = req.query
+    const filter = {};
+
+  if (name) {
+    filter.name = { $regex: name, $options: 'i' };
+  }
+
+  if (city) {
+    filter['address.city'] = { $regex: city, $options: 'i' };
+  }
+
+  try {
+    const results = await Restaurant.find(filter);
+    res.render('restaurants/restaurants',{ title: 'Restaurants', restaurants: results })
+  } catch (err) {
+    res.status(500).json({ error: 'Internal error' });
+  }
+
 }
-
-restaurantsController.createRestaurant = async function(req, res) {
-    try {
-        const newRestaurant = new Restaurant({
-            name: req.body.name,
-            address: {
-                street: req.body.street,
-                city: req.body.city,
-                postcode: req.body.postcode
-            },
-            contact: {
-                phone: req.body.phone,
-                email: req.body.email,
-                website: req.body.website
-            },
-            ownerId: req.user._id  // Pega o user autenticado
-        });
-
-        await newRestaurant.save();
-        res.redirect('/restaurants');
-    } catch (err) {
-        console.error(err);
-        res.status(500).render('error', { message: 'Erro ao criar restaurante' });
-    }
-};
-
-restaurantsController.editRestaurant = async function(req, res) {
-    const restaurant = await Restaurant.findById(req.params.id);
-
-    if (!restaurant || !restaurant.ownerId.equals(req.user._id)) {
-        return res.status(403).render('error', { message: 'Não autorizado' });
-    }
-
-    restaurant.name = req.body.name;
-    restaurant.address = {
-        street: req.body.street,
-        city: req.body.city,
-        postcode: req.body.postcode
-    };
-    restaurant.contact = {
-        phone: req.body.phone,
-        email: req.body.email,
-        website: req.body.website
-    };
-
-    await restaurant.save();
-    res.redirect('/restaurants/' + restaurant._id);
-};
-
-restaurantsController.deleteRestaurant = async function(req, res) {
-    const restaurant = await Restaurant.findById(req.params.id);
-
-    if (!restaurant || !restaurant.ownerId.equals(req.user._id)) {
-        return res.status(403).render('error', { message: 'Não autorizado' });
-    }
-
-    await restaurant.deleteOne();
-    res.redirect('/restaurants');
-};
 
 module.exports = restaurantsController

@@ -4,7 +4,7 @@ const ownerController = require('../controllers/ownerController');
 const authorizedRole = require('../middleware/authorizedRole');
 const upload = require('../middleware/upload');
 
-// Restaurant management
+// Gestão dos Restaurantes
 router.get('/my-restaurants', authorizedRole('restaurant'), ownerController.showMyRestaurants);
 router.get('/create-restaurant', authorizedRole('restaurant'), ownerController.showCreateRestaurant);
 router.post('/create-restaurant', authorizedRole('restaurant'), ownerController.createRestaurant);
@@ -12,7 +12,7 @@ router.get('/edit/:id', authorizedRole('restaurant'), ownerController.showEditRe
 router.post('/edit/:id', authorizedRole('restaurant'), ownerController.updateRestaurant);
 router.post('/delete/:id', authorizedRole('restaurant'), ownerController.deleteRestaurant);
 
-// Menu management
+// Gestão dos menus
 router.get('/restaurant/:restaurantId/menus', authorizedRole('restaurant'), ownerController.showRestaurantMenus);
 router.get('/restaurant/:restaurantId/menu/create', authorizedRole('restaurant'), ownerController.showCreateMenu);
 router.post('/restaurant/:restaurantId/menu/create', authorizedRole('restaurant'), ownerController.createMenu);
@@ -20,7 +20,7 @@ router.get('/menu/:menuId/edit', authorizedRole('restaurant'), ownerController.s
 router.post('/menu/:menuId/edit', authorizedRole('restaurant'), ownerController.updateMenu);
 router.post('/menu/:menuId/delete', authorizedRole('restaurant'), ownerController.deleteMenu);
 
-// MenuItem management
+// Gestão dos Itens dos Menus
 router.get('/menu/:menuId/items', authorizedRole('restaurant'), ownerController.showMenuItems);
 router.get('/menu/:menuId/item/create', authorizedRole('restaurant'), ownerController.showCreateMenuItem);
 router.post('/menu/:menuId/item/create', authorizedRole('restaurant'), upload.single('image'), ownerController.createMenuItem);

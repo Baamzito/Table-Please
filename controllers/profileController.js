@@ -6,17 +6,18 @@ let profileController = {}
 
 profileController.showProfile = async function (req, res) {
     try {
-        const userData = await User.findById(req.user.id)
-        res.render('profile/profile', { title: 'Profile', user: userData })
+        const userData = await User.findById(req.user.id);
+        res.render('profile/profile', { title: 'Profile', user: userData });
     } catch (error) {
+        console.log(error);
         res.status(500).send('Error fetching profile data.');
     }
 }
 
 profileController.showEditProfile = async function (req, res) {
     try {
-        const userData = await User.findById(req.user.id)
-        res.render('profile/profile-edit', { title: 'Profile Edit', user: userData })
+        const userData = await User.findById(req.user.id);
+        res.render('profile/profile-edit', { title: 'Profile Edit', user: userData });
     } catch (error) {
         res.status(500).send('Error fetching profile data.');
     }

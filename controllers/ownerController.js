@@ -1,19 +1,16 @@
 const Restaurant = require('../models/restaurant');
 const Menu = require('../models/menu');
 const MenuItem = require('../models/menuItem');
-const User = require('../models/user');
 const fs = require('fs');
 const path = require('path');
 
 let ownerController = {}
 
 ownerController.showMyRestaurants = async function (req, res) {
-    const userData = await User.findById(req.user.id);
     try {
         const restaurants = await Restaurant.find({ owner: req.user.id });
         res.render('owner/my-restaurants', {
             title: 'My Restaurants',
-            user: userData,
             restaurants: restaurants
         });
     } catch (error) {
@@ -69,11 +66,8 @@ ownerController.createRestaurant = async function (req, res) {
 
         res.redirect('/owner/my-restaurants');
     } catch (error) {
-        res.render('owner/create-restaurant', {
-            title: 'Create New Restaurant',
-            body: req.body,
-            error: error.message
-        });
+        console.log(error);
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
@@ -86,8 +80,8 @@ ownerController.showEditRestaurant = async function (req, res) {
             restaurant
         });
     } catch (error) {
-        req.session.error = 'Error fetching restaurant details';
-        res.redirect('/owner/my-restaurants');
+        console.log(error);
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
@@ -144,30 +138,39 @@ ownerController.updateRestaurant = async function (req, res) {
       
           res.redirect('/owner/my-restaurants');
     } catch (error) {
-        res.render('owner/edit-restaurant', {
-            title: 'Edit Restaurant',
-            restaurant: { ...req.body, _id: req.params.id },
-            error: error.message
-        });
+        console.log(error);
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
 ownerController.deleteRestaurant = async function (req, res) {
     try {
         const menus = await Menu.find({ restaurantId: req.params.id });
-
+        
         for (const menu of menus) {
+            const menuItems = await MenuItem.find({ menuId: menu._id });
+            
+            for (const item of menuItems) {
+                if (item.image) {
+                    const imagePath = path.join(__dirname, '../public', item.image);
+                    
+                    if (fs.existsSync(imagePath)) {
+                        fs.unlinkSync(imagePath);
+                        console.log(`Deleted image: ${imagePath}`);
+                    }
+                }
+            }
+            
             await MenuItem.deleteMany({ menuId: menu._id });
         }
-
+        
         await Menu.deleteMany({ restaurantId: req.params.id });
-
+        
         await Restaurant.findByIdAndDelete(req.params.id);
-
+        
         res.redirect('/owner/my-restaurants');
     } catch (error) {
-        console.log(error)
-
+        console.log(error);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 };
@@ -264,10 +267,8 @@ ownerController.deleteMenu = async function (req, res) {
         const menu = await Menu.findById(req.params.menuId);
         const restaurant = await Restaurant.findById(menu.restaurantId);
 
-        // Delete all menu items associated with this menu
         await MenuItem.deleteMany({ menuId: req.params.menuId });
 
-        // Delete the menu
         await Menu.findByIdAndDelete(req.params.menuId);
 
         res.redirect(`/owner/restaurant/${menu.restaurantId}/menus`);
@@ -277,7 +278,6 @@ ownerController.deleteMenu = async function (req, res) {
     }
 };
 
-// MenuItem management
 ownerController.showMenuItems = async function (req, res) {
     try {
         const menu = await Menu.findById(req.params.menuId);
@@ -397,7 +397,6 @@ ownerController.updateMenuItem = async function (req, res) {
             updateData.image = '/uploads/' + req.file.filename;
         }
 
-        // Update menu item with new data
         await MenuItem.findByIdAndUpdate(req.params.itemId, updateData);
 
         res.redirect(`/owner/menu/${menuItem.menuId}/items`);
