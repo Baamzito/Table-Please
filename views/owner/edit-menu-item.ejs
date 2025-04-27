@@ -118,15 +118,13 @@
                   <div class="col-md-6 mb-3">
                     <label for="itemInfo.fiber" class="form-label">Fiber (g)</label>
                     <input type="number" class="form-control" id="itemInfo.fiber" name="itemInfo_fiber" min="0" step="0.1" 
-                      value="<%= locals.body && body.itemInfo ? body.itemInfo.fiber : (menuItem.itemInfo.fiber || '') %>">
-                    <div class="form-text">Optional</div>
+                      value="<%= locals.body && body.itemInfo ? body.itemInfo.fiber : (menuItem.itemInfo.fiber || '') %>" required>
                   </div>
                   
                   <div class="col-md-6 mb-3">
                     <label for="itemInfo.sodium" class="form-label">Sodium (mg)</label>
                     <input type="number" class="form-control" id="itemInfo.sodium" name="itemInfo_sodium" min="0" step="1" 
-                      value="<%= locals.body && body.itemInfo ? body.itemInfo.sodium : (menuItem.itemInfo.sodium || '') %>">
-                    <div class="form-text">Optional</div>
+                      value="<%= locals.body && body.itemInfo ? body.itemInfo.sodium : (menuItem.itemInfo.sodium || '') %>" required>
                   </div>
                 </div>
               </div>
@@ -140,8 +138,8 @@
                 <div class="form-text">Current image</div>
               </div>
               <% } %>
-              <input type="file" class="form-control" id="image" name="image" accept="image/*">
-              <div class="form-text">Upload a new image to replace the current one (optional)</div>
+              <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+              <div class="form-text">Upload a new image to replace the current one</div>
             </div>
             
             <input type="hidden" name="menuId" value="<%= menu._id %>">

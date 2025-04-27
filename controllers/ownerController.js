@@ -3,6 +3,7 @@ const Menu = require('../models/menu');
 const MenuItem = require('../models/menuItem');
 const fs = require('fs');
 const path = require('path');
+const { Types } = require('mongoose');
 
 let ownerController = {}
 
@@ -177,9 +178,19 @@ ownerController.deleteRestaurant = async function (req, res) {
 
 ownerController.showRestaurantMenus = async function (req, res) {
     try {
-        const restaurant = await Restaurant.findById(req.params.restaurantId)
+        const restaurantId = req.params.restaurantId;
 
-        const menus = await Menu.find({ restaurantId: req.params.restaurantId })
+        if (!Types.ObjectId.isValid(restaurantId)) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const restaurant = await Restaurant.findById(restaurantId);
+
+        if (!restaurant) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const menus = await Menu.find({ restaurantId: restaurantId })
 
         res.render('owner/restaurant-menus', {
             title: `Menus for ${restaurant.name}`,
@@ -194,7 +205,17 @@ ownerController.showRestaurantMenus = async function (req, res) {
 
 ownerController.showCreateMenu = async function (req, res) {
     try {
-        const restaurant = await Restaurant.findById(req.params.restaurantId)
+        const restaurantId = req.params.restaurantId;
+
+        if (!Types.ObjectId.isValid(restaurantId)) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const restaurant = await Restaurant.findById(restaurantId)
+
+        if (!restaurant) {
+            return res.redirect('/owner/my-restaurants');
+        }
 
         res.render('owner/create-menu', {
             title: 'Create New Menu',
@@ -208,7 +229,31 @@ ownerController.showCreateMenu = async function (req, res) {
 
 ownerController.createMenu = async function (req, res) {
     try {
+        const restaurantId = req.params.restaurantId;
+
+        if (!Types.ObjectId.isValid(restaurantId)) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const restaurant = await Restaurant.findById(restaurantId);
+
+        if (!restaurant) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
         const { name, description, active } = req.body
+        const errors = [];
+
+        if (!name || name.trim() === '') errors.push('Name is required.');
+        if (!description || description.trim() === '') errors.push('Description is required.');
+
+        if (errors.length > 0) {
+            return res.render('owner/create-menu', {
+                title: 'Create Menu',
+                restaurant: restaurant,
+                error: errors.join(' ')
+              });
+        }
 
         const menu = await Menu.create({
             name: name,
@@ -217,9 +262,9 @@ ownerController.createMenu = async function (req, res) {
             active: active
         });
 
-        console.log(menu)
         res.redirect(`/owner/restaurant/${req.params.restaurantId}/menus`);
     } catch (error) {
+        console.log(error)
         res.render('owner/create-menu', {
             title: 'Create New Menu',
             restaurant: { _id: req.params.restaurantId },
@@ -231,8 +276,23 @@ ownerController.createMenu = async function (req, res) {
 
 ownerController.showEditMenu = async function (req, res) {
     try {
-        const menu = await Menu.findById(req.params.menuId);
+        const menuId = req.params.menuId;
+
+        if (!Types.ObjectId.isValid(menuId)) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const menu = await Menu.findById(menuId);
+
+        if (!menu) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
         const restaurant = await Restaurant.findById(menu.restaurantId);
+
+        if (!restaurant) {
+            return res.redirect('/owner/my-restaurants');
+        }
 
         res.render('owner/edit-menu', {
             title: 'Edit Menu',
@@ -240,48 +300,105 @@ ownerController.showEditMenu = async function (req, res) {
             restaurant
         });
     } catch (error) {
-        req.session.error = 'Error fetching menu details';
+        console.error(error);
         res.redirect('/owner/my-restaurants');
     }
 };
 
 ownerController.updateMenu = async function (req, res) {
     try {
-        const menu = await Menu.findById(req.params.menuId);
+        const menuId = req.params.menuId;
+
+        if (!Types.ObjectId.isValid(menuId)) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const menu = await Menu.findById(menuId);
+
+        if (!menu) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const restaurant = await Restaurant.findById(menu.restaurantId);
+
+        if (!restaurant) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const { name, description } = req.body;
+        const errors = []
+
+        if (!name || name.trim() === '') errors.push('Name is required.');
+        if (!description || description.trim() === '') errors.push('Description is required.');
+
+        if (errors.length > 0) {
+            return res.render('owner/edit-menu', {
+                title: 'Edit Menu',
+                menu: menu,
+                restaurant: restaurant,
+                error: errors.join(' ')
+              });
+        }
 
         await Menu.findByIdAndUpdate(req.params.menuId, req.body);
 
         res.redirect(`/owner/restaurant/${menu.restaurantId}/menus`);
     } catch (error) {
-        res.render('owner/edit-menu', {
-            title: 'Edit Menu',
-            menu: { ...req.body, _id: req.params.menuId },
-            restaurant: { _id: req.body.restaurantId },
-            error: error.message
-        });
+        console.log(error)
+        res.redirect('/owner/my-restaurants');
     }
 };
 
 ownerController.deleteMenu = async function (req, res) {
     try {
-        const menu = await Menu.findById(req.params.menuId);
+        const menuId = req.params.menuId;
+
+        if (!Types.ObjectId.isValid(menuId)) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const menu = await Menu.findById(menuId);
+
+        if (!menu) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
         const restaurant = await Restaurant.findById(menu.restaurantId);
 
-        await MenuItem.deleteMany({ menuId: req.params.menuId });
+        if (!restaurant) {
+            return res.redirect('/owner/my-restaurants');
+        }
 
-        await Menu.findByIdAndDelete(req.params.menuId);
+        await MenuItem.deleteMany({ menuId: menuId });
+        await Menu.findByIdAndDelete(menuId);
 
         res.redirect(`/owner/restaurant/${menu.restaurantId}/menus`);
     } catch (error) {
-        req.session.error = 'Error deleting menu';
+        console.log(error);
         res.redirect('/owner/my-restaurants');
     }
 };
 
 ownerController.showMenuItems = async function (req, res) {
     try {
-        const menu = await Menu.findById(req.params.menuId);
+        const menuId = req.params.menuId;
+
+        if (!Types.ObjectId.isValid(menuId)) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const menu = await Menu.findById(menuId);
+
+        if (!menu) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
         const restaurant = await Restaurant.findById(menu.restaurantId);
+
+        if (!restaurant) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
         const menuItems = await MenuItem.find({ menuId: req.params.menuId });
 
         res.render('owner/menu-items', {
@@ -291,15 +408,30 @@ ownerController.showMenuItems = async function (req, res) {
             menuItems
         });
     } catch (error) {
-        req.session.error = 'Error fetching menu items';
+        console.log(error)
         res.redirect('/owner/my-restaurants');
     }
 };
 
 ownerController.showCreateMenuItem = async function (req, res) {
     try {
-        const menu = await Menu.findById(req.params.menuId);
+        const menuId = req.params.menuId;
+
+        if (!Types.ObjectId.isValid(menuId)) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const menu = await Menu.findById(menuId);
+
+        if (!menu) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
         const restaurant = await Restaurant.findById(menu.restaurantId);
+
+        if (!restaurant) {
+            return res.redirect('/owner/my-restaurants');
+        }
 
         res.render('owner/create-menu-item', {
             title: 'Add New Menu Item',
@@ -314,28 +446,73 @@ ownerController.showCreateMenuItem = async function (req, res) {
 
 ownerController.createMenuItem = async function (req, res) {
     try {
-        const menu = await Menu.findById(req.params.menuId);
+        const menuId = req.params.menuId;
+
+        if (!Types.ObjectId.isValid(menuId)) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const menu = await Menu.findById(menuId);
+
+        if (!menu) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
         const restaurant = await Restaurant.findById(menu.restaurantId);
 
+        if (!restaurant) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const { name, description, category, available, price } = req.body;
+
+        const errors = []
+
+        if (!name || name.trim() === '') errors.push('Name is required.');
+        if (!description || description.trim() === '') errors.push('Description is required.');
+        if (!price || isNaN(price)) errors.push('Valid price is required.');
+
+        const itemInfo = {
+            calories: req.body.itemInfo_calories ? Number(req.body.itemInfo_calories) : null,
+            proteins: req.body.itemInfo_proteins ? Number(req.body.itemInfo_proteins) : null,
+            fats: req.body.itemInfo_fats ? Number(req.body.itemInfo_fats) : null,
+            carbohydrates: req.body.itemInfo_carbohydrates ? Number(req.body.itemInfo_carbohydrates) : null,
+            fiber: req.body.itemInfo_fiber ? Number(req.body.itemInfo_fiber) : null,
+            sodium: req.body.itemInfo_sodium ? Number(req.body.itemInfo_sodium) : null,
+        };
+
+        Object.keys(itemInfo).forEach(key => {
+            if (itemInfo[key] === null || isNaN(itemInfo[key])) {
+                errors.push(`${key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()} is required and must be a valid number.`);
+            }
+        });
+
+        if (!req.file) {
+            errors.push('Image is required.');
+        }
+
+        if (errors.length > 0) {
+            return res.render('owner/create-menu-item', {
+                title: 'Add New Menu Item',
+                menu,
+                restaurant,
+                error: errors
+            });
+        }
+
+        let imagePath = null;
         if (req.file) {
             imagePath = '/uploads/' + req.file.filename;
         }
 
         await MenuItem.create({
-            name: req.body.name,
-            description: req.body.description,
-            category: req.body.category,
-            available: req.body.available === 'true',
-            itemInfo: {
-                calories: req.body.itemInfo_calories,
-                proteins: req.body.itemInfo_proteins,
-                fats: req.body.itemInfo_fats,
-                carbohydrates: req.body.itemInfo_carbohydrates,
-                fiber: req.body.itemInfo_fiber,
-                sodium: req.body.itemInfo_sodium,
-            },
-            price: Number(req.body.price),
-            menuId: req.params.menuId,
+            name: name,
+            description: description,
+            category: category,
+            available: available === 'true',
+            itemInfo: itemInfo,
+            price: Number(price),
+            menuId: menuId,
             image: imagePath
         })
 
@@ -348,9 +525,29 @@ ownerController.createMenuItem = async function (req, res) {
 
 ownerController.showEditMenuItem = async function (req, res) {
     try {
-        const menuItem = await MenuItem.findById(req.params.itemId);
+        const itemId = req.params.itemId;
+
+        if (!Types.ObjectId.isValid(itemId)) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const menuItem = await MenuItem.findById(itemId);
+
+        if (!menuItem) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
         const menu = await Menu.findById(menuItem.menuId);
+
+        if (!menu) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
         const restaurant = await Restaurant.findById(menu.restaurantId);
+
+        if (!restaurant) {
+            return res.redirect('/owner/my-restaurants');
+        }
 
         res.render('owner/edit-menu-item', {
             title: 'Edit Menu Item',
@@ -359,36 +556,81 @@ ownerController.showEditMenuItem = async function (req, res) {
             restaurant
         });
     } catch (error) {
-        req.session.error = 'Error fetching menu item details';
+        console.log(error)
         res.redirect('/owner/my-restaurants');
     }
 };
 
 ownerController.updateMenuItem = async function (req, res) {
     try {
-        const menuItem = await MenuItem.findById(req.params.itemId);
+        const itemId =  req.params.itemId;
+
+        if (!Types.ObjectId.isValid(itemId)) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const menuItem = await MenuItem.findById(itemId);
+
+        if (!menuItem) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
         const menu = await Menu.findById(menuItem.menuId);
 
-        const updateData = {
-            name: req.body.name,
-            description: req.body.description,
-            price: req.body.price,
-            category: req.body.category,
-            available: req.body.available === 'true',
-            itemInfo: {
-                calories: req.body.itemInfo_calories,
-                proteins: req.body.itemInfo_proteins,
-                fats: req.body.itemInfo_fats,
-                carbohydrates: req.body.itemInfo_carbohydrates,
-                fiber: req.body.itemInfo_fiber || undefined,
-                sodium: req.body.itemInfo_sodium || undefined
+        if (!menu) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const restaurant = await Restaurant.findById(menu.restaurantId);
+
+        if (!restaurant) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const { name, description, price, category, available, itemInfo_calories, itemInfo_proteins, itemInfo_fats, itemInfo_carbohydrates, itemInfo_fiber, itemInfo_sodium } = req.body;
+        const errors = [];
+
+        if (!name || name.trim() === '') errors.push('Name is required.');
+        if (!description || description.trim() === '') errors.push('Description is required.');
+        if (!price || isNaN(price)) errors.push('Valid price is required.');
+        
+        const itemInfo = {
+            calories: itemInfo_calories ? Number(itemInfo_calories) : null,
+            proteins: itemInfo_proteins ? Number(itemInfo_proteins) : null,
+            fats: itemInfo_fats ? Number(itemInfo_fats) : null,
+            carbohydrates: itemInfo_carbohydrates ? Number(itemInfo_carbohydrates) : null,
+            fiber: itemInfo_fiber ? Number(itemInfo_fiber) : null,
+            sodium: itemInfo_sodium ? Number(itemInfo_sodium) : null,
+        };
+
+        Object.keys(itemInfo).forEach(key => {
+            if (itemInfo[key] === null || isNaN(itemInfo[key])) {
+                errors.push(`${key.charAt(0).toUpperCase() + key.slice(1)} is required and must be a valid number.`);
             }
+        });
+
+        if (errors.length > 0) {
+            return res.render('owner/edit-menu-item', {
+                title: 'Edit Menu Item',
+                menuItem,
+                menu,
+                restaurant,
+                error: errors
+            });
+        }
+
+        const updateData = {
+            name,
+            description,
+            price: Number(price),
+            category,
+            available: available === 'true',
+            itemInfo,
         };
 
         if (req.file) {
             if (menuItem.image) {
-                const oldImagePath = path.join(__dirname, '../public', menuItem.image);
-                
+                const oldImagePath = path.join(__dirname, '../public', menuItem.image); 
                 if (fs.existsSync(oldImagePath)) {
                     fs.unlinkSync(oldImagePath);
                 }
@@ -407,9 +649,29 @@ ownerController.updateMenuItem = async function (req, res) {
 
 ownerController.deleteMenuItem = async function (req, res) {
     try {
-        const menuItem = await MenuItem.findById(req.params.itemId);
+        const itemId =  req.params.itemId;
+
+        if (!Types.ObjectId.isValid(itemId)) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
+        const menuItem = await MenuItem.findById(itemId);
+        
+        if (!menuItem) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
         const menu = await Menu.findById(menuItem.menuId);
+
+        if (!menu) {
+            return res.redirect('/owner/my-restaurants');
+        }
+
         const restaurant = await Restaurant.findById(menu.restaurantId);
+
+        if (!restaurant) {
+            return res.redirect('/owner/my-restaurants');
+        }
 
         if (menuItem.image) {
             const oldImagePath = path.join(__dirname, '../public', menuItem.image);

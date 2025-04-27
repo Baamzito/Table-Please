@@ -111,14 +111,12 @@
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label for="itemInfo.fiber" class="form-label">Fiber (g)</label>
-                    <input type="number" class="form-control" id="itemInfo.fiber" name="itemInfo_fiber" min="0" step="0.1" value="<%= locals.body && body.itemInfo ? body.itemInfo.fiber : '' %>">
-                    <div class="form-text">Optional</div>
+                    <input type="number" class="form-control" id="itemInfo.fiber" name="itemInfo_fiber" min="0" step="0.1" value="<%= locals.body && body.itemInfo ? body.itemInfo.fiber : '' %>" required>
                   </div>
                   
                   <div class="col-md-6 mb-3">
                     <label for="itemInfo.sodium" class="form-label">Sodium (mg)</label>
-                    <input type="number" class="form-control" id="itemInfo.sodium" name="itemInfo_sodium" min="0" step="1" value="<%= locals.body && body.itemInfo ? body.itemInfo.sodium : '' %>">
-                    <div class="form-text">Optional</div>
+                    <input type="number" class="form-control" id="itemInfo.sodium" name="itemInfo_sodium" min="0" step="1" value="<%= locals.body && body.itemInfo ? body.itemInfo.sodium : '' %>" required>
                   </div>
                 </div>
               </div>
@@ -126,8 +124,8 @@
             
             <div class="mb-4">
               <label for="image" class="form-label">Item Image</label>
-              <input type="file" class="form-control" id="image" name="image" accept="image/*">
-              <div class="form-text">Upload an image of your menu item (optional)</div>
+              <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+              <div class="form-text">Upload an image of your menu item</div>
             </div>
             
             <input type="hidden" name="menuId" value="<%= menu._id %>">

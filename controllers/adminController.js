@@ -243,7 +243,6 @@ adminController.getAllRestaurants = async function (req, res) {
 
     } catch (error) {
         console.error('Erro ao obter todos os restaurantes:', error);
-        req.flash('error', 'Ocorreu um erro ao carregar todos os restaurantes');
         res.redirect('/admin/dashboard');
     }
 }
