@@ -211,6 +211,7 @@ adminController.deleteRestaurant = async function (req, res) {
     }
 }
 
+//Fazer a view 'restaurants', talvez alterar para 'all-owners'
 adminController.getValidatedRestaurants = async function (req, res) {
     try {
         const restaurantsList = await Restaurant.find()
@@ -229,6 +230,7 @@ adminController.getValidatedRestaurants = async function (req, res) {
     }
 }
 
+//Fazer a view 'all-restaurants'
 adminController.getAllRestaurants = async function (req, res) {
     try {
         const allRestaurants = await Restaurant.find()

@@ -35,12 +35,13 @@
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label for="city" class="form-label">City *</label>
-                    <input type="text" class="form-control" id="city" name="address_city">
+                    <input type="text" class="form-control" id="city" name="address_city" required>
                   </div>
                   
                   <div class="col-md-6 mb-3">
                     <label for="postcode" class="form-label">Postal Code *</label>
-                    <input type="text" class="form-control" id="postcode" name="address_postcode">
+                    <input type="text" class="form-control" id="postcode" name="address_postcode" required pattern="[0-9]{4}-[0-9]{3}">
+                    <div class="form-text">Enter a valid postal code</div>
                   </div>
                 </div>
               </div>
@@ -55,13 +56,12 @@
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label for="phone" class="form-label">Phone Number *</label>
-                    <input type="tel" class="form-control" id="phone" name="contact_phone" required>
+                    <input type="tel" class="form-control" id="phone" name="contact_phone" required pattern="9[0-9]{8}">
                   </div>
                   
                   <div class="col-md-6 mb-3">
                     <label for="email" class="form-label">Email Address</label>
                     <input type="email" class="form-control" id="email" name="contact_email" required>
-                    <div class="form-text">Optional contact email for the restaurant</div>
                   </div>
                 </div>
               </div>
