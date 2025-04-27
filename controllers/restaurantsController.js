@@ -1,7 +1,6 @@
 const Restaurant = require('../models/restaurant')
 const Menu = require('../models/menu')
 const MenuItem = require('../models/menuItem')
-const User = require('../models/user');
 
 const restaurantsController = {}
 

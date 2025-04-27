@@ -27,9 +27,9 @@ adminController.showDashboard = async function (req, res) {
         });
 
     } catch (error) {
-        console.error('Erro no painel de administração:', error);
+        console.error(error);
         res.status(500).render('error', {
-            message: 'Ocorreu um erro ao carregar o painel de administração',
+            message: 'An error ocurred',
             error: process.env.NODE_ENV === 'development' ? error : {}
         });
     }
@@ -93,7 +93,7 @@ adminController.validateUser = async function (req, res) {
         });
 
     } catch (error) {
-        console.error('Erro ao validar utilizador:', error);
+        console.error(error);
         res.redirect('/admin/dashboard');
     }
 }
@@ -133,7 +133,7 @@ adminController.addRestaurant = async function (req, res) {
         });
 
     } catch (error) {
-        console.error('Erro ao adicionar restaurante:', error);
+        console.error(error);
         res.redirect('/admin/dashboard');
     }
 }
@@ -181,7 +181,7 @@ adminController.editRestaurant = async function (req, res) {
         });
 
     } catch (error) {
-        console.error('Erro ao editar restaurante:', error);
+        console.error(error);
         res.redirect('/admin/dashboard');
     }
 };
@@ -206,7 +206,7 @@ adminController.deleteRestaurant = async function (req, res) {
         });
 
     } catch (error) {
-        console.error('Erro ao remover restaurante:', error);
+        console.error(error);
         res.redirect('/admin/dashboard');
     }
 }
@@ -224,7 +224,7 @@ adminController.getValidatedRestaurants = async function (req, res) {
         });
 
     } catch (error) {
-        console.error('Erro ao obter restaurantes:', error);
+        console.error(error);
         res.redirect('/admin/dashboard');
     }
 }
@@ -242,7 +242,7 @@ adminController.getAllRestaurants = async function (req, res) {
         });
 
     } catch (error) {
-        console.error('Erro ao obter todos os restaurantes:', error);
+        console.error(error);
         res.redirect('/admin/dashboard');
     }
 }
