@@ -1,0 +1,79 @@
+.homepage-container {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.hero-section {
+  background-image: url('/assets/images/hero-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.hero-bg-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  top: 0;
+  left: 0;
+}
+
+.min-vh-75 {
+  min-height: 75vh;
+}
+
+.search-container {
+  border-radius: 8px;
+}
+
+.hover-card {
+  transition: transform 0.3s;
+ 
+  &:hover {
+    transform: translateY(-5px);
+  }
+}
+
+.restaurant-img {
+  height: 200px;
+  object-fit: cover;
+}
+
+.icon-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+ 
+  i {
+    font-size: 24px;
+  }
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.row {
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+}
+
+.container-fluid {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  .container-fluid, .container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}

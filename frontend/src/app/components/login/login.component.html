@@ -1,1 +1,122 @@
-<p>login works!</p>
+<div class="d-flex flex-column min-vh-100">
+  <div class="flex-grow-1 d-flex align-items-center justify-content-center py-4">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+          <div class="card shadow-sm">
+            <div class="card-body p-4">
+              <h2 class="text-center mb-4">Login</h2>
+              <div
+                *ngIf="error"
+                class="alert alert-danger alert-dismissible fade show"
+                role="alert"
+              >
+                {{ error }}
+                <button
+                  type="button"
+                  class="btn-close"
+                  (click)="closeAlert()"
+                  aria-label="Close"
+                ></button>
+              </div>
+
+              <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+                <div class="mb-3">
+                  <label for="username" class="form-label">Username</label>
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="fas fa-user"></i
+                    ></span>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="username"
+                      formControlName="username"
+                      placeholder="Enter your username"
+                      [ngClass]="{
+                        'is-invalid':
+                          loginForm.get('username')?.invalid &&
+                          loginForm.get('username')?.touched
+                      }"
+                    />
+                  </div>
+                  <div
+                    *ngIf="
+                      loginForm.get('username')?.invalid &&
+                      loginForm.get('username')?.touched
+                    "
+                    class="text-danger small mt-1"
+                  >
+                    Username is required
+                  </div>
+                </div>
+
+                <!-- Campo de senha -->
+                <div class="mb-3">
+                  <label for="password" class="form-label">Password</label>
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="fas fa-lock"></i
+                    ></span>
+                    <input
+                      [type]="hidePassword ? 'password' : 'text'"
+                      class="form-control"
+                      id="password"
+                      formControlName="password"
+                      placeholder="Enter your password"
+                      [ngClass]="{
+                        'is-invalid':
+                          loginForm.get('password')?.invalid &&
+                          loginForm.get('password')?.touched
+                      }"
+                    />
+                    <button
+                      class="btn btn-outline-secondary"
+                      type="button"
+                      (click)="togglePasswordVisibility()"
+                    >
+                      <i
+                        class="fas"
+                        [ngClass]="hidePassword ? 'fa-eye' : 'fa-eye-slash'"
+                      ></i>
+                    </button>
+                  </div>
+                  <div
+                    *ngIf="
+                      loginForm.get('password')?.invalid &&
+                      loginForm.get('password')?.touched
+                    "
+                    class="text-danger small mt-1"
+                  >
+                    Password is required
+                  </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    [disabled]="loginForm.invalid"
+                  >
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                  </button>
+                </div>
+              </form>
+
+              <hr class="my-4" />
+
+              <div class="text-center">
+                <p class="mb-0">
+                  Don't have an account?
+                  <a routerLink="/auth/signup" class="text-decoration-none"
+                    >Sign up</a
+                  >
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

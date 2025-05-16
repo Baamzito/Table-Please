@@ -134,66 +134,31 @@ authController.signup = async function(req, res){
 }
 
 authController.login = async function(req, res){
-    const {username, password} = req.body
+    const {username, password} = req.body;
 
     if (!username || !password) {
-        return res.render('auth/login', {
-            title: 'Login', 
-            error: 'Username and password are required.'
-        })
+        return res.status(500).json({message: 'Username and password are required.'});
     }
 
     try{
-        const user = await User.findOne({username})
+        const user = await User.findOne({username});
 
         if(!user){
-            return res.render('auth/login', {
-                title: 'Login', 
-                error: 'Username or password is invalid.'
-            })
+            return res.status(500).json({message: 'Username or password is invalid.'});
         }
 
-        const passwordMatched = await bcrypt.compare(password, user.password)
+        const passwordMatched = await bcrypt.compare(password, user.password);
+
         if(!passwordMatched){
-            return res.render('auth/login', {
-                title: 'Login', 
-                error: 'Username or password is invalid.'
-            })
+            return res.status(500).json({message: 'Username or password is invalid.'});
         }
 
-        const accessToken = jwt.sign({id: user._id, username: user.username, role: user.role}, process.env.JWT_SECRET, {expiresIn: '7d'}) 
+        const token = jwt.sign({id: user._id, username: user.username, role: user.role}, process.env.JWT_SECRET, {expiresIn: '7d'});
 
-        res.cookie('accessToken', accessToken, {
-            httpOnly: true,
-            sameSite: 'strict',
-            maxAge: 604800000 // 7 dias
-        });
-
-        res.locals.isAuthenticated = true
-        
-        return res.redirect('/')
+        return res.json({token});
     } catch(err){
         console.error('Login error:', err);
-        
-        return res.render('auth/login', {
-            title: 'Login',
-            error: 'An error occurred during login. Please try again.'
-        });
-    }
-}
-
-authController.logout = function(req, res) {
-    try {
-        res.clearCookie('accessToken', {
-            httpOnly: true,
-            sameSite: 'strict',
-        });
-        
-        return res.redirect('/auth/login');
-    } catch (err) {
-        console.error('Logout error:', err);
-
-        return res.redirect('/auth/login');
+        return res.status(500).json({message: 'Server error during login.'});
     }
 }
 
