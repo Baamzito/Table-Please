@@ -22,89 +22,56 @@ authController.signup = async function(req, res){
     const { username, password, email, role, firstName, lastName, street, city, postalCode } = req.body;
 
     if (!username || typeof username !== 'string' || username.trim().length < 5) {
-        return res.render('auth/signup', { 
-            title: 'Sign up',
-            error: 'Username is required and must be at least 5 characters long.' 
-        });
+        return res.status(400).json({ error: 'Username is required and must be at least 5 characters long.' });
     }
 
     if (!password || typeof password !== 'string' || password.length < 8) {
-        return res.render('auth/signup', { 
-            title: 'Sign up',
-            error: 'Password is required and must be at least 8 characters long.' 
-        });
+        return res.status(400).json({ error: 'Password is required and must be at least 8 characters long.' });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
-        return res.render('auth/signup', { 
-            title: 'Sign up',
-            error: 'Please enter a valid email address.' 
-        });
+        return res.status(400).json({ error: 'Please enter a valid email address.' });
     }
 
     const validRoles = ['customer', 'restaurant'];
     if (!role || !validRoles.includes(role)) {
-        return res.render('auth/signup', {
-            title: 'Sign up',
-            error: 'Please select a valid account type.' 
-        });
+        return res.status(400).json({ error: 'Please select a valid account type.' });
     }
 
     if (!firstName || typeof firstName !== 'string' || firstName.trim() === '') {
-        return res.render('auth/signup', { 
-            title: 'Sign up',
-            error: 'First name is required.' 
-        });
+        return res.status(400).json({ error: 'First name is required.' });
     }
 
     if (!lastName || typeof lastName !== 'string' || lastName.trim() === '') {
-        return res.render('auth/signup', { 
-            title: 'Sign up',
-            error: 'Last name is required.' 
-        });
+        return res.status(400).json({ error: 'Last name is required.' });
     }
 
     if (!street || typeof street !== 'string' || street.trim() === '') {
-        return res.render('auth/signup', { 
-            title: 'Sign up',
-            error: 'Street address is required.' 
-        });
+        return res.status(400).json({ error: 'Street address is required.' });
     }
 
     if (!city || typeof city !== 'string' || city.trim() === '') {
-        return res.render('auth/signup', { 
-            title: 'Sign up',
-            error: 'City is required.' 
-        });
+        return res.status(400).json({ error: 'City is required.' });
     }
 
     const postalRegex = /^[0-9]{4}-[0-9]{3}$/;
     if (!postalCode || !postalRegex.test(postalCode)) {
-        return res.render('auth/signup', { 
-            title: 'Sign up',
-            error: 'Please enter a valid postal code in format XXXX-XXX.' 
-        });
+        return res.status(400).json({ error: 'Please enter a valid postal code in format XXXX-XXX.' });
     }
 
     try {
         const existingUser = await User.findOne({ username });
         if (existingUser) {
-            return res.render('auth/signup', { 
-                title: 'Sign up',
-                error: 'Username already exists. Please choose another one.' 
-            });
+            return res.status(409).json({ error: 'Username already exists. Please choose another one.' });
         }
         
         const existingEmail = await User.findOne({ email });
         if (existingEmail) {
-            return res.render('auth/signup', { 
-                title: 'Sign up',
-                error: 'Email already registered. Please use another email or log in.' 
-            });
+            return res.status(409).json({ error: 'Email already registered. Please use another email or log in.' });
         }
         
-        const user = await User.create({
+        await User.create({
             username, 
             password, 
             email, 
@@ -118,39 +85,33 @@ authController.signup = async function(req, res){
             }
         });
         
-        return res.render('auth/login', { 
-            title: 'Login',
-            success: 'Account created successfully! You can now log in.' 
-        });
+        return res.status(201).json({ message: 'Account created successfully!' });
         
     } catch (err) {
         console.error('Error during signup:', err);
-        return res.render('auth/signup', { 
-            title: 'Sign up',
-            error: 'An error occurred during registration. Please try again.' 
-        });
+        return res.status(500).json({ message: 'An error occurred during registration. Please try again.' });
     }
-
 }
+
 
 authController.login = async function(req, res){
     const {username, password} = req.body;
 
     if (!username || !password) {
-        return res.status(500).json({message: 'Username and password are required.'});
+        return res.status(400).json({message: 'Username and password are required.'});
     }
 
     try{
         const user = await User.findOne({username});
 
         if(!user){
-            return res.status(500).json({message: 'Username or password is invalid.'});
+            return res.status(401).json({message: 'Username or password is invalid.'});
         }
 
         const passwordMatched = await bcrypt.compare(password, user.password);
 
         if(!passwordMatched){
-            return res.status(500).json({message: 'Username or password is invalid.'});
+            return res.status(401).json({message: 'Username or password is invalid.'});
         }
 
         const token = jwt.sign({id: user._id, username: user.username, role: user.role}, process.env.JWT_SECRET, {expiresIn: '7d'});
@@ -158,7 +119,7 @@ authController.login = async function(req, res){
         return res.json({token});
     } catch(err){
         console.error('Login error:', err);
-        return res.status(500).json({message: 'Server error during login.'});
+        return res.status(500).json({message: 'Internal Server Error.'});
     }
 }
 

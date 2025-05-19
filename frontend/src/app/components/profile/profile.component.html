@@ -1,0 +1,139 @@
+<div class="container mt-5 pt-5" style="min-height: calc(100vh - 150px)">
+  <div class="row">
+    <!-- Sidebar / Menu -->
+    <div class="col-lg-3 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-center mb-3">
+            <img
+              [src]="user.profileImage || '/assets/images/default-avatar.jpg'"
+              alt="Profile Picture"
+              class="img-fluid rounded-circle profile-image mb-3"
+              style="width: 120px; height: 120px; object-fit: cover"
+            />
+            <h5 class="mb-0">{{ user.firstName + ' ' + user.lastName }}</h5>
+            <p class="text-muted small">{{'@' + user.username }}</p>
+            <p class="text-muted small" *ngIf="user.address && (user.address.city || user.address.street)">
+              <i class="fas fa-map-marker-alt me-1"></i>
+              {{ user.address?.city || '' }}
+            </p>
+            <p class="text-muted small" *ngIf="!(user.address && (user.address.city || user.address.street))">
+              <i class="fas fa-map-marker-alt me-1"></i>Location not set
+            </p>
+            <div class="d-grid">
+              <a routerLink="/profile/edit" class="btn btn-outline-primary">
+                <i class="fas fa-user-edit me-2"></i>Edit Profile
+              </a>
+            </div>
+          </div>
+
+          <hr />
+
+          <div class="profile-menu">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link active" routerLink="/profile">
+                  <i class="fas fa-user me-2"></i>My Profile
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" routerLink="/profile/change-password">
+                  <i class="fas fa-lock me-2"></i>Change Password
+                </a>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link text-danger" (click)="logout()">
+                  <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-lg-9">
+      <!-- Account Validation Status -->
+      <div class="card shadow-sm mb-4" *ngIf="user.role === 'restaurant'">
+        <div class="card-header bg-white">
+          <h5 class="card-title mb-0">Account Status</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <span *ngIf="user.validated" class="badge bg-success me-2">
+              <i class="fas fa-check me-1"></i>Validated
+            </span>
+            <span *ngIf="user.validated" class="text-muted small">
+              Your account has been verified.
+            </span>
+            <span *ngIf="!user.validated" class="badge bg-warning me-2">
+              <i class="fas fa-exclamation-triangle me-1"></i>Pending Validation
+            </span>
+            <span *ngIf="!user.validated" class="text-muted small">
+              Your account is awaiting validation. Some features may be limited until verification is complete.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Overview -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="card-title mb-0">Profile Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <p class="text-muted small mb-1">Name</p>
+              <p class="mb-0">{{ user.firstName + ' ' + user.lastName }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <p class="text-muted small mb-1">Username</p>
+              <p class="mb-0">{{'@' + user.username }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <p class="text-muted small mb-1">Email Address</p>
+              <p class="mb-0">{{ user.email }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <p class="text-muted small mb-1">Member Since</p>
+              <p class="mb-0">{{ user.createdAt | date:'longDate' }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <p class="text-muted small mb-1">Last Updated</p>
+              <p class="mb-0">{{ user.updatedAt | date:'longDate' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Address Information -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">Address Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="row" *ngIf="user.address && (user.address.street || user.address.city || user.address.postalCode)">
+            <div class="col-md-12 mb-3" *ngIf="user.address?.street">
+              <p class="text-muted small mb-1">Street</p>
+              <p class="mb-0">{{ user.address.street }}</p>
+            </div>
+            <div class="col-md-6 mb-3" *ngIf="user.address?.city">
+              <p class="text-muted small mb-1">City</p>
+              <p class="mb-0">{{ user.address.city }}</p>
+            </div>
+            <div class="col-md-6 mb-3" *ngIf="user.address?.postalCode">
+              <p class="text-muted small mb-1">Postal Code</p>
+              <p class="mb-0">{{ user.address.postalCode }}</p>
+            </div>
+          </div>
+          <p class="text-muted" *ngIf="!(user.address && (user.address.street || user.address.city || user.address.postalCode))">
+            No address information provided.
+            <a routerLink="/profile/edit" fragment="address">Add your address</a> to improve your experience.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

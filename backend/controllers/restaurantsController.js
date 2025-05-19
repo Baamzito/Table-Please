@@ -66,11 +66,10 @@ restaurantsController.searchRestaurants = async function(req, res){
 
   try {
     const results = await Restaurant.find(filter);
-    res.render('restaurants/restaurants',{ title: 'Restaurants', restaurants: results })
+    return res.status(200).json(results);
   } catch (err) {
     res.status(500).json({ error: 'Internal error' });
   }
-
 }
 
 module.exports = restaurantsController

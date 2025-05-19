@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { environment } from '../../environments/environment.development';
 import { DecodedToken } from '../models/decoded-token.model';
 import { jwtDecode } from 'jwt-decode';
-import { BehaviorSubject } from 'rxjs';
+import { Observable } from 'rxjs';
 
 
 @Injectable({
@@ -49,6 +49,11 @@ export class AuthService {
       console.error('Erro ao decodificar o token:', err);
       return null;
     }
+  }
+
+  changePassword(currentPassword: string, newPassword: string, confirmPassword: string): Observable<any> {
+    const body = { currentPassword, newPassword, confirmPassword };
+    return this.http.post(`${environment.url}/profile/change-password`, body);
   }
 
 }

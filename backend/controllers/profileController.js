@@ -1,6 +1,7 @@
 const User = require('../models/user')
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
 
 let profileController = {}
 
@@ -11,6 +12,8 @@ profileController.showProfile = async function (req, res) {
         if(!user){
             return res.status(404).json({message: 'User not found.'});
         }
+
+        user.profileImage = `${process.env.BASE_URL}${user.profileImage}`
 
         return res.json(user)
     } catch (error) {
@@ -187,42 +190,31 @@ profileController.updatePassword = async function (req, res) {
         const userId = req.user.id;
 
         const user = await User.findById(userId);
+        
+        if (!user) {
+        return res.status(404).json({ error: 'User not found.' });
+        }
 
         const isMatch = await user.comparePassword(currentPassword);
         if (!isMatch) {
-            return res.render('profile/change-password', {
-                title: 'Change Password',
-                error: 'Incorrect current password.',
-                user: user
-            });
+        return res.status(400).json({ error: 'Incorrect current password.' });
         }
 
         if (newPassword !== confirmPassword) {
-            return res.render('profile/change-password', {
-                title: 'Change Password',
-                error: 'New passwords do not match.',
-                user: user
-            });
+        return res.status(400).json({ error: 'New passwords do not match.' });
         }
 
         if (newPassword.length < 5) {
-            return res.render('profile/change-password', {
-                title: 'Change Password',
-                error: 'Password must be at least 5 characters long.',
-                user: user
-            });
+        return res.status(400).json({ error: 'Password must be at least 5 characters long.' });
         }
 
         user.password = newPassword;
         await user.save();
 
-        res.render('profile/profile', {
-            title: 'Change Password',
-            success: 'Password changed successfully!',
-            user: user
-        });
+        return res.status(200).json({ message: 'Password changed successfully!' });
     } catch (error) {
         console.error('Error changing password:', error);
+        return res.status(500).json({ error: 'Internal server error.' });
     }
 }
 

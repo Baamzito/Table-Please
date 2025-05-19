@@ -1,0 +1,103 @@
+<!-- restaurants.component.html -->
+<div class="main-content-wrapper">
+<section class="hero-section position-relative w-100">
+  <div class="hero-bg-overlay position-absolute w-100 h-100"></div>
+  <div class="container-fluid position-relative py-4">
+    <div class="row align-items-center py-4">
+      <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-4 text-white fw-bold mb-3">Explore Restaurants</h1>
+        <p class="lead text-white mb-4">Discover amazing places to eat and drink</p>
+
+        <div class="search-container bg-white p-3 rounded shadow mx-3 mx-md-auto" style="max-width: 700px">
+          <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+            <div class="row g-3">
+              <div class="col-md-5">
+                <div class="input-group">
+                  <span class="input-group-text bg-transparent border-0">
+                    <i class="fas fa-utensils text-primary"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control border-0"
+                    formControlName="name"
+                    placeholder="Restaurant name"
+                  />
+                </div>
+              </div>
+              <div class="col-md-5">
+                <div class="input-group">
+                  <span class="input-group-text bg-transparent border-0">
+                    <i class="fas fa-map-marker-alt text-primary"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control border-0"
+                    formControlName="city"
+                    placeholder="City"
+                  />
+                </div>
+              </div>
+              <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                  <i class="fas fa-search me-2"></i>Search
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<section class="filters-section py-3 border-bottom">
+  <div class="container-fluid px-lg-5">
+    <div class="row align-items-center px-3 px-lg-5">
+      <div class="col-md-12 mb-3 mb-md-0">
+        <span class="text-muted">
+          <strong>{{ restaurants.length }}</strong> restaurants found
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 w-100 main-content">
+  <div class="container-fluid px-lg-5">
+    <div class="row px-3 px-lg-5">
+      <div class="col-12 text-center py-5" *ngIf="restaurants.length === 0">
+        <div class="alert alert-info p-4">
+          <i class="fas fa-info-circle me-2"></i> No restaurants found. Try adjusting your search criteria.
+        </div>
+        <button class="btn btn-primary mt-4" (click)="clearFilters()">Clear Filters</button>
+      </div>
+      <div class="col-md-6 col-lg-4 mb-4" *ngFor="let restaurant of restaurants">
+        <div class="card h-100 shadow-sm hover-card">
+          <img *ngIf="restaurant.imageUrl" [src]="restaurant.imageUrl" class="card-img-top restaurant-img" [alt]="restaurant.name" />
+          <div *ngIf="!restaurant.imageUrl" class="bg-light text-center py-5 restaurant-img">
+            <i class="fas fa-utensils fa-3x text-secondary"></i>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title mb-0">{{ restaurant.name }}</h5>
+            <p class="text-muted small mb-2">
+              <i class="fas fa-map-marker-alt me-2"></i>
+              {{ restaurant.address?.street }}, {{ restaurant.address?.city }}, {{ restaurant.address?.postalCode }}
+            </p>
+            <p class="text-muted small mb-2">
+              <i class="fas fa-phone me-2"></i>
+              {{ restaurant.contact?.phone || 'Phone not available' }}
+            </p>
+            <p class="text-muted small mb-2">
+              <i class="fas fa-envelope me-2"></i>
+              {{ restaurant.contact?.email || 'Email not available' }}
+            </p>
+          </div>
+          <div class="card-footer bg-white border-top-0 text-end">
+            <a [routerLink]="['/restaurants', restaurant._id]" class="btn btn-outline-primary btn-sm">View Details</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

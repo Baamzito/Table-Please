@@ -10,21 +10,16 @@ import { CommonModule } from '@angular/common';
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
-export class NavbarComponent implements OnInit{
+export class NavbarComponent {
   user: any = null;
 
   constructor(private router: Router, private authService: AuthService, private userService: UserService){}
 
-  ngOnInit() {
-    this.getUser();
-  }
-
-  getUser() {
-    if (this.isLoggedIn()) {
+  getUser(){
+    if (this.isLoggedIn() && this.user == null) {
       this.userService.getUser().subscribe({
         next: (user) => {
           this.user = user;
-          console.log(user)
         },
         error: (err) => {
           console.error(err);
@@ -38,6 +33,7 @@ export class NavbarComponent implements OnInit{
   }
 
   logout(){
+    this.user = null;
     this.authService.logout();
     this.router.navigate(['/auth/login']);
   }

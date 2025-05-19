@@ -1,0 +1,102 @@
+/* Hero Section */
+.hero-section {
+  background: url('/assets/images/restaurant-hero.jpg') no-repeat center center;
+  background-size: cover;
+  min-height: 400px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 71px;
+  padding-top: 20px;
+}
+
+.hero-bg-overlay {
+  background-color: rgba(0, 0, 0, 0.6);
+  top: 0;
+  left: 0;
+}
+
+.search-container {
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 30px;
+}
+
+.search-container .form-control {
+  height: 48px;
+  font-size: 1rem;
+}
+
+.search-container .form-control:focus {
+  box-shadow: none;
+}
+
+.search-container .input-group {
+  border-right: 1px solid #e0e0e0;
+}
+
+.search-container .col-md-5:last-child .input-group {
+  border-right: none;
+}
+
+.search-container .btn {
+  height: 48px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.restaurant-img {
+  height: 200px;
+  object-fit: cover;
+}
+
+.list-view-img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+
+.hover-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.filters-section {
+  background-color: #f8f9fa;
+}
+
+.btn-group .btn.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+@media (max-width: 767px) {
+  .search-container .input-group {
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+  }
+ 
+  .search-container .col-md-5:last-child .input-group {
+    border-bottom: none;
+  }
+  
+  .hero-section {
+    min-height: 350px;
+    margin-top: 56px;
+  }
+}
+
+body {
+  padding-top: 0;
+}
+
+.main-content-wrapper {
+  position: relative;
+  z-index: 1;
+}

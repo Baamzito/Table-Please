@@ -10,6 +10,11 @@
             <button type="button" class="btn-close" (click)="closeAlert()" aria-label="Close"></button>
           </div>
 
+          <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ success }}
+            <button type="button" class="btn-close" (click)="closeSuccessAlert()" aria-label="Close"></button>
+          </div>
+
           <form [formGroup]="signupForm" (ngSubmit)="onSignup()">
             <!-- Name -->
             <div class="mb-3">
