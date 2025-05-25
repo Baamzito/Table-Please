@@ -1,0 +1,114 @@
+.hero-section {
+  position: relative;
+  background-attachment: fixed;
+}
+
+.preview-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.remove-image {
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-category {
+  margin-bottom: 2rem;
+}
+
+.card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.12) !important;
+}
+
+.details-btn {
+  transition: all 0.2s;
+}
+
+.details-btn:hover {
+  transform: scale(1.05);
+}
+
+.nav-tabs .nav-link {
+  color: #6c757d;
+  border: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.nav-tabs .nav-link:hover {
+  border-color: #dee2e6;
+  color: #495057;
+}
+
+.nav-tabs .nav-link.active {
+  color: #007bff;
+  background-color: transparent;
+  border-color: #007bff;
+}
+
+.sticky-top {
+  z-index: 1020;
+}
+
+/* Modal styles */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal {
+  z-index: 1050;
+}
+
+.modal.show {
+  opacity: 1;
+}
+
+.modal-dialog {
+  margin: 1.75rem auto;
+}
+
+.modal-content {
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    height: 300px;
+  }
+  
+  .display-4 {
+    font-size: 2rem;
+  }
+  
+  .sticky-top {
+    position: relative !important;
+    top: auto !important;
+  }
+}
+
+.card .row .col-4 > div {
+  min-height: 120px;
+}
+
+.badge {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}

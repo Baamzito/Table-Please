@@ -17,4 +17,29 @@ export class RestaurantService {
 
     return this.http.get<any[]>(`${environment.url}/restaurants/search`, { params });
   }
+
+  getAllRestaurants(): Observable<any> {
+    return this.http.get<any>(`${environment.url}/restaurants`);
+  }
+
+  getRestaurantById(id: string): Observable<any> {
+    return this.http.get<any>(`${environment.url}/restaurants/${id}`);
+  }
+
+  getOwnerRestaurants(){
+    return this.http.get<any>(`${environment.url}/owner/restaurants`);
+  }
+
+  createRestaurant(restaurantData: any) {
+    return this.http.post<any>(`${environment.url}/owner/restaurants`, restaurantData);
+  }
+
+  deleteRestaurant(id: string){
+    return this.http.delete<any>(`${environment.url}/owner/restaurants/${id}`);
+  }
+
+  updateRestaurant(id: string, restaurantData: any) {
+    return this.http.put<any>(`${environment.url}/owner/restaurants/${id}`, restaurantData);
+  }
+
 }

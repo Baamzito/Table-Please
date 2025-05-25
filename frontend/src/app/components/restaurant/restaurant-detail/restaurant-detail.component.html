@@ -1,0 +1,236 @@
+<!-- Error message -->
+<div *ngIf="error" class="alert alert-danger" role="alert">
+  {{ error }}
+</div>
+
+<!-- Restaurant content -->
+<div *ngIf="restaurant">
+  <!-- Restaurant Header -->
+  <section class="hero-section position-relative" 
+           [style.background-image]="'url(/images/restaurants/' + restaurant._id + '/header.jpg)'" 
+           style="background-size: cover; height: 400px; margin-top: 0; padding-top: 0;">
+    <div class="position-absolute w-100 h-100" style="background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7));"></div>
+    <div class="container position-relative h-100 d-flex align-items-end pb-4">
+      <div class="text-white mb-3">
+        <h1 class="display-4 fw-bold mb-2">{{ restaurant.name }}</h1>
+        <div class="d-flex align-items-center flex-wrap">
+          <p class="mb-2 fs-5">
+            <i class="fas fa-map-marker-alt me-2"></i>
+            {{ restaurant.address.street }}, {{ restaurant.address.city }}, {{ restaurant.address.postcode }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Actions Bar -->
+  <div class="bg-white shadow-sm sticky-top" style="margin-top: 0;">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center py-3">
+        <ul class="nav nav-pills">
+          <li class="nav-item">
+            <a class="nav-link active px-4" href="#menu">Menu</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <section class="py-4 bg-light">
+    <div class="container">
+      <div class="row g-4">
+        <!-- Left Side Column - Content -->
+        <div class="col-lg-8">
+          <!-- Menu Section -->
+          <div id="menu" class="card shadow-sm border-0 overflow-hidden mb-4">
+            <div class="card-body p-4">
+              <h2 class="card-title h3 mb-4 pb-2 border-bottom">Menu</h2>
+
+              <div *ngIf="menus && menus.length > 0; else noMenus">
+                <!-- Menu Navigation -->
+                <ul *ngIf="menus.length > 1" class="nav nav-tabs nav-fill mb-4">
+                  <li *ngFor="let menu of menus; let i = index" class="nav-item">
+                    <a class="nav-link" [class.active]="i === 0" [href]="'#menu-' + menu._id">
+                      {{ menu.name }}
+                    </a>
+                  </li>
+                </ul>
+
+                <div *ngFor="let menu of menus; let i = index" class="menu-section mb-5" [id]="'menu-' + menu._id">
+                  <h3 class="h4 mb-4">{{ menu.name }}</h3>
+                  <p *ngIf="menu.description" class="mb-4">{{ menu.description }}</p>
+                  
+                  <div *ngIf="getCategoryNames(menu).length > 0; else noItems">
+                    <div *ngFor="let categoryName of getCategoryNames(menu)" 
+                         class="menu-category mb-4" 
+                         [id]="getCategoryId(menu._id, categoryName)">
+                      <h4 class="h5 mb-3 pb-2 border-bottom">{{ categoryName }}</h4>
+                      <div class="row g-4">
+                        <div *ngFor="let item of getCategorizedItems(menu)[categoryName]" class="col-lg-6 mb-3">
+                          <div class="card h-100 border-0 shadow-sm">
+                            <div class="row g-0">
+                              <div class="col-4">
+                                <div *ngIf="item.image; else noImage" 
+                                     class="h-100" 
+                                     [style.background-image]="'url(' + item.image + ')'" 
+                                     style="background-size: cover; background-position: center;">
+                                </div>
+                                <ng-template #noImage>
+                                  <div class="bg-light h-100 d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-utensils fa-2x text-secondary opacity-50"></i>
+                                  </div>
+                                </ng-template>
+                              </div>
+                              <div class="col-8">
+                                <div class="card-body p-3">
+                                  <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title mb-0">{{ item.name }}</h5>
+                                    <span class="badge bg-primary rounded-pill px-3 py-2">
+                                      ${{ item.price | number:'1.2-2' }}
+                                    </span>
+                                  </div>
+                                  <p class="card-text text-muted small mb-2" 
+                                     style="height: 40px; max-height: 40px; overflow: hidden; position: relative;">
+                                    {{ item.description }}
+                                  </p>
+                                  <div class="mt-2 d-flex justify-content-end align-items-center">
+                                    <button *ngIf="item.itemInfo" 
+                                            type="button" 
+                                            class="btn btn-sm btn-outline-primary details-btn"
+                                            (click)="showModal(item)">
+                                      View Details
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <ng-template #noItems>
+                    <p class="text-muted">No items available for this menu.</p>
+                  </ng-template>
+                </div>
+              </div>
+              <ng-template #noMenus>
+                <p class="text-muted">No menu information available for this restaurant.</p>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side Column - Sidebar -->
+        <div class="col-lg-4">
+          <div class="sticky-top" style="top: 80px;">
+            <!-- Contact Information -->
+            <div class="card shadow border-0 overflow-hidden mb-4">
+              <div class="card-body p-4">
+                <h4 class="card-title mb-3">
+                  <i class="fas fa-id-card me-2 text-primary"></i>Contact Information
+                </h4>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item px-0 py-3 d-flex border-top-0">
+                    <div class="me-3">
+                      <span class="btn btn-sm btn-primary rounded-circle">
+                        <i class="fas fa-phone"></i>
+                      </span>
+                    </div>
+                    <div>
+                      <p class="text-muted mb-1 small">Phone</p>
+                      <a [href]="'tel:' + restaurant.contact.phone" class="text-decoration-none fw-medium">
+                        {{ restaurant.contact.phone }}
+                      </a>
+                    </div>
+                  </li>
+                  <li *ngIf="restaurant.contact && restaurant.contact.email" 
+                      class="list-group-item px-0 py-3 d-flex border-bottom-0">
+                    <div class="me-3">
+                      <span class="btn btn-sm btn-primary rounded-circle">
+                        <i class="fas fa-envelope"></i>
+                      </span>
+                    </div>
+                    <div>
+                      <p class="text-muted mb-1 small">Email</p>
+                      <a [href]="'mailto:' + restaurant.contact.email" class="text-decoration-none fw-medium">
+                        {{ restaurant.contact.email }}
+                      </a>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Modal -->
+<div *ngIf="selectedModalItem" 
+     class="modal fade show" 
+     id="itemModal" 
+     tabindex="-1" 
+     style="display: block;"
+     (click)="onBackdropClick($event)">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ selectedModalItem.name }} - Nutritional Information</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="selectedModalItem.description" class="mb-4">
+          <h6 class="mb-2">Description</h6>
+          <p>{{ selectedModalItem.description }}</p>
+        </div>
+        
+        <div class="card border-0 mb-4">
+          <div class="card-body p-0">
+            <h6 class="mb-2">Nutritional Information</h6>
+            <table class="table table-striped mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th scope="col">Nutrient</th>
+                  <th scope="col" class="text-end">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Calories</td>
+                  <td class="text-end">{{ selectedModalItem.itemInfo.calories }} kcal</td>
+                </tr>
+                <tr>
+                  <td>Proteins</td>
+                  <td class="text-end">{{ selectedModalItem.itemInfo.proteins }} g</td>
+                </tr>
+                <tr>
+                  <td>Fats</td>
+                  <td class="text-end">{{ selectedModalItem.itemInfo.fats }} g</td>
+                </tr>
+                <tr>
+                  <td>Carbohydrates</td>
+                  <td class="text-end">{{ selectedModalItem.itemInfo.carbohydrates }} g</td>
+                </tr>
+                <tr *ngIf="selectedModalItem.itemInfo.fiber !== undefined">
+                  <td>Fiber</td>
+                  <td class="text-end">{{ selectedModalItem.itemInfo.fiber }} g</td>
+                </tr>
+                <tr *ngIf="selectedModalItem.itemInfo.sodium !== undefined">
+                  <td>Sodium</td>
+                  <td class="text-end">{{ selectedModalItem.itemInfo.sodium }} mg</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

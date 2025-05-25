@@ -1,0 +1,86 @@
+<div class="container mt-5 pt-5" style="min-height: calc(100vh - 150px)">
+  <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ success }}
+    <button type="button" class="btn-close" (click)="closeAlert('success')" aria-label="Close"></button>
+  </div>
+  
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="closeAlert('error')" aria-label="Close"></button>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>My Restaurants</h2>
+    <a routerLink="/owner/restaurants/create" class="btn btn-primary">
+      <i class="fas fa-plus me-2"></i>Add New Restaurant
+    </a>
+  </div>
+
+  <ng-container *ngIf="restaurants.length > 0; else noRestaurants">
+    <div class="row">
+      <div *ngFor="let restaurant of restaurants" class="col-lg-4 col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ restaurant.name }}</h5>
+            <p class="card-text text-muted small">
+              <i class="fas fa-map-marker-alt me-1"></i>{{ restaurant.address.city }}, {{ restaurant.address.street }}
+            </p>
+            <p class="card-text text-muted small">
+              <i class="fas fa-phone me-1"></i>{{ restaurant.contact.phone }}
+            </p>
+            <p *ngIf="restaurant.contact.email" class="card-text text-muted small">
+              <i class="fas fa-envelope me-1"></i>{{ restaurant.contact.email }}
+            </p>
+          </div>
+          <div class="card-footer bg-white">
+            <div class="d-flex justify-content-between">
+              <a [routerLink]="['/owner/restaurants', restaurant._id, 'menus']" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-utensils me-1"></i>Manage Menus
+              </a>
+              <div>
+                <a [routerLink]="['/owner/restaurants', restaurant._id]" class="btn btn-outline-secondary btn-sm me-1">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" [attr.data-bs-target]="'#deleteModal' + restaurant._id">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delete Modal -->
+        <div class="modal fade" [id]="'deleteModal' + restaurant._id" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to delete <strong>{{ restaurant.name }}</strong>? This action will also delete all associated menus and menu items and cannot be undone.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" (click)="deleteRestaurant(restaurant._id)" data-bs-dismiss="modal">Delete Restaurant</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #noRestaurants>
+    <div class="card shadow-sm">
+      <div class="card-body text-center py-5">
+        <i class="fas fa-store fa-3x text-muted mb-3"></i>
+        <h4>No Restaurants Yet</h4>
+        <p class="text-muted">You haven't added any restaurants yet. Get started by creating your first restaurant!</p>
+        <a routerLink="/owner/restaurants/create" class="btn btn-primary">
+          <i class="fas fa-plus me-2"></i>Add New Restaurant
+        </a>
+      </div>
+    </div>
+  </ng-template>
+</div>

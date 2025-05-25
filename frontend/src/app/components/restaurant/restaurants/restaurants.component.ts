@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { RestaurantService } from '../../services/restaurant.service';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { RestaurantService } from '../../../services/restaurant.service';
 
 @Component({
   selector: 'app-restaurants',

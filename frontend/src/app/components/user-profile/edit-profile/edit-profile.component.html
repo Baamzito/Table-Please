@@ -1,0 +1,196 @@
+<div class="container mt-5 pt-5">
+  <!-- Alert de erro -->
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="clearError()" aria-label="Close"></button>
+  </div>
+  
+  <div *ngIf="user" class="row">
+    <!-- Sidebar / Menu -->
+    <div class="col-lg-3 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-center mb-3">
+            <img [src]="user.profileImage || '/assets/images/default-avatar.jpg'" 
+                 alt="Profile Picture" 
+                 class="img-fluid rounded-circle profile-image mb-3" 
+                 style="width: 120px; height: 120px; object-fit: cover;">
+            <h5 class="mb-0">{{ user.firstName + ' ' + user.lastName }}</h5>
+            <p class="text-muted small">{{'@' + user.username }}</p>
+            <p *ngIf="user.address?.city" class="text-muted small">
+              <i class="fas fa-map-marker-alt me-1"></i>{{ user.address.city }}
+            </p>
+          </div>
+          
+          <hr>
+          
+          <div class="profile-menu">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" routerLink="/profile">
+                  <i class="fas fa-user me-2"></i>My Profile
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" routerLink="/profile/change-password">
+                  <i class="fas fa-lock me-2"></i>Change Password
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-danger" routerLink="/auth/logout">
+                  <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="col-lg-9">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">Edit Profile</h5>
+          <a routerLink="/profile" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Back to Profile
+          </a>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+            <!-- Profile Picture -->
+            <div class="mb-4">
+              <label class="form-label">Profile Picture</label>
+              <div class="d-flex align-items-center">
+                <div class="position-relative me-3">
+                  <img [src]="previewImageSrc" 
+                       alt="Current Profile Picture" 
+                       class="rounded-circle preview-image" 
+                       style="width: 100px; height: 100px; object-fit: cover;">
+                  <button type="button" 
+                          class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 rounded-circle remove-image"
+                          [class.d-none]="previewImageSrc === '/assets/images/default-avatar.jpg'"
+                          (click)="onRemoveImage()">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                <div>
+                  <input type="file" 
+                         class="form-control mb-2" 
+                         id="profileImage" 
+                         name="profileImage" 
+                         accept="image/*"
+                         (change)="onFileSelected($event)">
+                  <small class="text-muted">Max file size: 5MB. Supported formats: JPG, PNG, GIF.</small>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Personal Information -->
+            <h5 class="mt-4 mb-3">Personal Information</h5>
+            
+            <div class="row mb-3">
+              <div class="col-md-6 mb-3">
+                <label for="firstName" class="form-label">First Name</label>
+                <input type="text" 
+                       class="form-control" 
+                       id="firstName" 
+                       formControlName="firstName"
+                       [class.is-invalid]="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched">
+                <div *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched" 
+                     class="invalid-feedback">
+                  First name is required.
+                </div>
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="lastName" class="form-label">Last Name</label>
+                <input type="text" 
+                       class="form-control" 
+                       id="lastName" 
+                       formControlName="lastName"
+                       [class.is-invalid]="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">
+                <div *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched" 
+                     class="invalid-feedback">
+                  Last name is required.
+                </div>
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6 mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" 
+                       class="form-control" 
+                       id="username" 
+                       formControlName="username"
+                       [class.is-invalid]="profileForm.get('username')?.invalid && profileForm.get('username')?.touched">
+                <div class="form-text">Username must be unique and contain only letters, numbers, and underscores.</div>
+                <div *ngIf="profileForm.get('username')?.invalid && profileForm.get('username')?.touched" 
+                     class="invalid-feedback">
+                  <span *ngIf="profileForm.get('username')?.errors?.['required']">Username is required.</span>
+                  <span *ngIf="profileForm.get('username')?.errors?.['pattern']">Username can only contain letters, numbers, and underscores.</span>
+                </div>
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" 
+                       class="form-control" 
+                       id="email" 
+                       formControlName="email"
+                       [class.is-invalid]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+                <div *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" 
+                     class="invalid-feedback">
+                  <span *ngIf="profileForm.get('email')?.errors?.['required']">Email is required.</span>
+                  <span *ngIf="profileForm.get('email')?.errors?.['email']">Please enter a valid email address.</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Address Information -->
+            <h5 class="mt-4 mb-3" id="address">Address Information</h5>
+            
+            <div class="row mb-3">
+              <div class="col-md-12 mb-3">
+                <label for="street" class="form-label">Street</label>
+                <input type="text" 
+                       class="form-control" 
+                       id="street" 
+                       formControlName="street">
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="city" class="form-label">City</label>
+                <input type="text" 
+                       class="form-control" 
+                       id="city" 
+                       formControlName="city">
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="postalCode" class="form-label">Postal Code</label>
+                <input type="text" 
+                       class="form-control" 
+                       id="postalCode" 
+                       formControlName="postalCode">
+              </div>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">
+                Cancel
+              </button>
+              <button type="submit" 
+                      class="btn btn-primary" 
+                      [disabled]="profileForm.invalid">
+                <i class="fas fa-save me-2"></i>
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

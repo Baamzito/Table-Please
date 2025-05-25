@@ -7,23 +7,14 @@ const { Types } = require('mongoose');
 
 let ownerController = {}
 
-ownerController.showMyRestaurants = async function (req, res) {
+ownerController.getMyRestaurants = async function (req, res) {
     try {
         const restaurants = await Restaurant.find({ owner: req.user.id });
-        res.render('owner/my-restaurants', {
-            title: 'My Restaurants',
-            restaurants: restaurants
-        });
+        res.status(200).json(restaurants);
     } catch (error) {
         console.log(error)
         return res.status(500).json({ message: "Internal Server Error" });
     }
-};
-
-ownerController.showCreateRestaurant = function (req, res) {
-    res.render('owner/create-restaurant', {
-        title: 'Create New Restaurant'
-    });
 };
 
 ownerController.createRestaurant = async function (req, res) {
@@ -44,11 +35,7 @@ ownerController.createRestaurant = async function (req, res) {
         }
 
         if (errors.length > 0) {
-            return res.render('owner/create-restaurant', {
-                title: 'Create New Restaurant',
-                body: req.body,
-                error: errors.join(' ')
-            });
+            return res.status(400).json({ errors: errors });
         }
 
         await Restaurant.create({
@@ -65,21 +52,17 @@ ownerController.createRestaurant = async function (req, res) {
             owner: ownerId
         });
 
-        res.redirect('/owner/my-restaurants');
+        return res.status(201).json({ message: 'Restaurant created successfully.' });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
-ownerController.showEditRestaurant = async function (req, res) {
+ownerController.getRestaurantById = async function (req, res) {
     try {
         const restaurant = await Restaurant.findById(req.params.id);
-
-        res.render('owner/edit-restaurant', {
-            title: 'Edit Restaurant',
-            restaurant
-        });
+        return res.status(200).json({ restaurant });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal Server Error" });
@@ -137,7 +120,7 @@ ownerController.updateRestaurant = async function (req, res) {
       
           await Restaurant.findByIdAndUpdate(req.params.id, updatedData, { new: true });
       
-          res.redirect('/owner/my-restaurants');
+          return res.status(200).json({ message: 'Restaurant updated successfully.' });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal Server Error" });
@@ -146,7 +129,8 @@ ownerController.updateRestaurant = async function (req, res) {
 
 ownerController.deleteRestaurant = async function (req, res) {
     try {
-        const menus = await Menu.find({ restaurantId: req.params.id });
+        const restaurantId = req.params.id;
+        const menus = await Menu.find({ restaurantId });
         
         for (const menu of menus) {
             const menuItems = await MenuItem.find({ menuId: menu._id });
@@ -165,11 +149,10 @@ ownerController.deleteRestaurant = async function (req, res) {
             await MenuItem.deleteMany({ menuId: menu._id });
         }
         
-        await Menu.deleteMany({ restaurantId: req.params.id });
+        await Menu.deleteMany({ restaurantId });
+        await Restaurant.findByIdAndDelete(restaurantId);
         
-        await Restaurant.findByIdAndDelete(req.params.id);
-        
-        res.redirect('/owner/my-restaurants');
+        return res.status(200).json({ message: 'Restaurant and related data deleted successfully.' });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal Server Error" });
