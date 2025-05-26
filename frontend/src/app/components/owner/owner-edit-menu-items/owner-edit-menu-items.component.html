@@ -1,0 +1,431 @@
+<div class="container mt-5 pt-5" style="min-height: calc(100vh - 150px)">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a routerLink="/owner/restaurants">My Restaurants</a>
+          </li>
+          <li class="breadcrumb-item" *ngIf="restaurant">
+            <a [routerLink]="['/owner/restaurants', restaurant._id, 'menus']"
+              >{{ restaurant.name }} Menus</a
+            >
+          </li>
+          <li class="breadcrumb-item" *ngIf="menu">
+            <a [routerLink]="['/owner/restaurants', restaurant._id, 'menus', menu._id, 'items']"
+              >{{ menu.name }} Items</a
+            >
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">Edit Item</li>
+        </ol>
+      </nav>
+
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Edit Item: {{ menuItem?.name }}</h4>
+            <a
+              [routerLink]="['/owner/restaurants', restaurant._id, 'menus', menu._id, 'items']"
+              class="btn btn-sm btn-outline-secondary"
+            >
+              <i class="fas fa-arrow-left me-1"></i>Back to Items
+            </a>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- Loading State -->
+          <div *ngIf="loading" class="text-center py-4">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+
+          <!-- Error Message -->
+          <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+            {{ errorMessage }}
+          </div>
+
+          <!-- Form -->
+          <form
+            *ngIf="!loading && itemForm"
+            [formGroup]="itemForm"
+            (ngSubmit)="onSubmit()"
+            enctype="multipart/form-data"
+          >
+            <!-- Item Name -->
+            <div class="mb-3">
+              <label for="name" class="form-label">Item Name *</label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                formControlName="name"
+                [class.is-invalid]="
+                  itemForm.get('name')?.invalid && itemForm.get('name')?.touched
+                "
+              />
+              <div
+                *ngIf="
+                  itemForm.get('name')?.invalid && itemForm.get('name')?.touched
+                "
+                class="invalid-feedback"
+              >
+                Item name is required.
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+              <label for="description" class="form-label">Description *</label>
+              <textarea
+                class="form-control"
+                id="description"
+                formControlName="description"
+                rows="3"
+                [class.is-invalid]="
+                  itemForm.get('description')?.invalid &&
+                  itemForm.get('description')?.touched
+                "
+              ></textarea>
+              <div
+                *ngIf="
+                  itemForm.get('description')?.invalid &&
+                  itemForm.get('description')?.touched
+                "
+                class="invalid-feedback"
+              >
+                Description is required.
+              </div>
+            </div>
+
+            <div class="row">
+              <!-- Price -->
+              <div class="col-md-6 mb-3">
+                <label for="price" class="form-label">Price *</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="price"
+                    formControlName="price"
+                    min="0"
+                    step="0.01"
+                    [class.is-invalid]="
+                      itemForm.get('price')?.invalid &&
+                      itemForm.get('price')?.touched
+                    "
+                  />
+                </div>
+                <div
+                  *ngIf="
+                    itemForm.get('price')?.invalid &&
+                    itemForm.get('price')?.touched
+                  "
+                  class="invalid-feedback"
+                >
+                  Valid price is required.
+                </div>
+              </div>
+
+              <!-- Category -->
+              <div class="col-md-6 mb-3">
+                <label for="category" class="form-label">Category *</label>
+                <select
+                  class="form-select"
+                  id="category"
+                  formControlName="category"
+                  [class.is-invalid]="
+                    itemForm.get('category')?.invalid &&
+                    itemForm.get('category')?.touched
+                  "
+                >
+                  <option value="" disabled>Select a category</option>
+                  <option value="Appetizer">Appetizer</option>
+                  <option value="Main Course">Main Course</option>
+                  <option value="Side">Side</option>
+                  <option value="Dessert">Dessert</option>
+                  <option value="Beverage">Beverage</option>
+                  <option value="Vegetarian">Vegetarian</option>
+                  <option value="Vegan">Vegan</option>
+                  <option value="Kids">Kids</option>
+                  <option value="Gluten-Free">Gluten-Free</option>
+                  <option value="Healthy">Healthy</option>
+                </select>
+                <div
+                  *ngIf="
+                    itemForm.get('category')?.invalid &&
+                    itemForm.get('category')?.touched
+                  "
+                  class="invalid-feedback"
+                >
+                  Category is required.
+                </div>
+              </div>
+            </div>
+
+            <!-- Availability -->
+            <div class="mb-3">
+              <label class="form-label d-block">Availability</label>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="available"
+                  id="available"
+                  value="true"
+                  formControlName="available"
+                />
+                <label class="form-check-label" for="available"
+                  >Available</label
+                >
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="available"
+                  id="unavailable"
+                  value="false"
+                  formControlName="available"
+                />
+                <label class="form-check-label" for="unavailable"
+                  >Unavailable</label
+                >
+              </div>
+            </div>
+
+            <!-- Nutritional Information -->
+            <div class="card mb-4" formGroupName="itemInfo">
+              <div class="card-header bg-light">
+                <h5 class="mb-0">Nutritional Information</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="calories" class="form-label"
+                      >Calories (kcal) *</label
+                    >
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="calories"
+                      formControlName="calories"
+                      min="0"
+                      [class.is-invalid]="
+                        itemForm.get('itemInfo.calories')?.invalid &&
+                        itemForm.get('itemInfo.calories')?.touched
+                      "
+                    />
+                    <div
+                      *ngIf="
+                        itemForm.get('itemInfo.calories')?.invalid &&
+                        itemForm.get('itemInfo.calories')?.touched
+                      "
+                      class="invalid-feedback"
+                    >
+                      Calories is required.
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label for="proteins" class="form-label"
+                      >Proteins (g) *</label
+                    >
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="proteins"
+                      formControlName="proteins"
+                      min="0"
+                      step="0.1"
+                      [class.is-invalid]="
+                        itemForm.get('itemInfo.proteins')?.invalid &&
+                        itemForm.get('itemInfo.proteins')?.touched
+                      "
+                    />
+                    <div
+                      *ngIf="
+                        itemForm.get('itemInfo.proteins')?.invalid &&
+                        itemForm.get('itemInfo.proteins')?.touched
+                      "
+                      class="invalid-feedback"
+                    >
+                      Proteins is required.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="fats" class="form-label">Fats (g) *</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="fats"
+                      formControlName="fats"
+                      min="0"
+                      step="0.1"
+                      [class.is-invalid]="
+                        itemForm.get('itemInfo.fats')?.invalid &&
+                        itemForm.get('itemInfo.fats')?.touched
+                      "
+                    />
+                    <div
+                      *ngIf="
+                        itemForm.get('itemInfo.fats')?.invalid &&
+                        itemForm.get('itemInfo.fats')?.touched
+                      "
+                      class="invalid-feedback"
+                    >
+                      Fats is required.
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label for="carbohydrates" class="form-label"
+                      >Carbohydrates (g) *</label
+                    >
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="carbohydrates"
+                      formControlName="carbohydrates"
+                      min="0"
+                      step="0.1"
+                      [class.is-invalid]="
+                        itemForm.get('itemInfo.carbohydrates')?.invalid &&
+                        itemForm.get('itemInfo.carbohydrates')?.touched
+                      "
+                    />
+                    <div
+                      *ngIf="
+                        itemForm.get('itemInfo.carbohydrates')?.invalid &&
+                        itemForm.get('itemInfo.carbohydrates')?.touched
+                      "
+                      class="invalid-feedback"
+                    >
+                      Carbohydrates is required.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="fiber" class="form-label">Fiber (g) *</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="fiber"
+                      formControlName="fiber"
+                      min="0"
+                      step="0.1"
+                      [class.is-invalid]="
+                        itemForm.get('itemInfo.fiber')?.invalid &&
+                        itemForm.get('itemInfo.fiber')?.touched
+                      "
+                    />
+                    <div
+                      *ngIf="
+                        itemForm.get('itemInfo.fiber')?.invalid &&
+                        itemForm.get('itemInfo.fiber')?.touched
+                      "
+                      class="invalid-feedback"
+                    >
+                      Fiber is required.
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label for="sodium" class="form-label">Sodium (mg) *</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="sodium"
+                      formControlName="sodium"
+                      min="0"
+                      step="1"
+                      [class.is-invalid]="
+                        itemForm.get('itemInfo.sodium')?.invalid &&
+                        itemForm.get('itemInfo.sodium')?.touched
+                      "
+                    />
+                    <div
+                      *ngIf="
+                        itemForm.get('itemInfo.sodium')?.invalid &&
+                        itemForm.get('itemInfo.sodium')?.touched
+                      "
+                      class="invalid-feedback"
+                    >
+                      Sodium is required.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="mb-4">
+              <label for="image" class="form-label">Item Image</label>
+
+              <!-- Current Image Preview -->
+              <div *ngIf="menuItem?.image" class="mb-2">
+                <img
+                  [src]="menuItem.image"
+                  [alt]="menuItem.name"
+                  class="img-thumbnail"
+                  style="max-height: 150px"
+                />
+                <div class="form-text">Current image</div>
+              </div>
+
+              <input
+                type="file"
+                class="form-control"
+                id="image"
+                (change)="onFileSelected($event)"
+                accept="image/*"
+                [class.is-invalid]="
+                  !selectedFile && itemForm.touched && isImageRequired
+                "
+              />
+              <div class="form-text">
+                Upload a new image to replace the current one (optional for
+                updates)
+              </div>
+              <div
+                *ngIf="!selectedFile && itemForm.touched && isImageRequired"
+                class="invalid-feedback"
+              >
+                Image is required.
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex justify-content-between mt-4">
+              <a
+                [routerLink]="['/owner/restaurants', restaurant._id, 'menus', menu._id, 'items']"
+                class="btn btn-outline-secondary"
+                >Cancel</a
+              >
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="itemForm.invalid || isSubmitting"
+              >
+                <span
+                  *ngIf="isSubmitting"
+                  class="spinner-border spinner-border-sm me-2"
+                  role="status"
+                ></span>
+                {{ isSubmitting ? "Updating Item..." : "Update Item" }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,138 @@
+<div class="container mt-5 pt-5" style="min-height: calc(100vh - 150px)">
+  
+  <!-- Success Alert -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="dismissAlert('success')" aria-label="Close"></button>
+  </div>
+  
+  <!-- Error Alert -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="dismissAlert('error')" aria-label="Close"></button>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="restaurant">
+    
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="javascript:void(0)" (click)="navigateToMyRestaurants()">My Restaurants</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">{{ restaurant.name }} Menus</li>
+      </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>{{ restaurant.name }} - Menus</h2>
+      <button type="button" class="btn btn-primary" (click)="navigateToCreateMenu()">
+        <i class="fas fa-plus me-2"></i>Add New Menu
+      </button>
+    </div>
+
+    <!-- Menus Grid -->
+    <div *ngIf="menus.length > 0" class="row">
+      <div *ngFor="let menu of menus" class="col-lg-4 col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ menu.name }}</h5>
+            <p *ngIf="menu.description" class="card-text">
+              {{ truncateDescription(menu.description, 100) }}
+            </p>
+            <p class="card-text text-muted small">
+              <span *ngIf="menu.active" class="badge bg-success me-2">
+                <i class="fas fa-check me-1"></i>Available
+              </span>
+              <span *ngIf="!menu.active" class="badge bg-secondary me-2">
+                <i class="fas fa-times me-1"></i>Unavailable
+              </span>
+              <span *ngIf="menu.type" class="badge bg-info text-dark">
+                {{ menu.type }}
+              </span>
+            </p>
+          </div>
+          <div class="card-footer bg-white">
+            <div class="d-flex justify-content-between">
+              <button 
+                type="button" 
+                class="btn btn-outline-primary btn-sm"
+                (click)="navigateToManageItems(menu._id)">
+                <i class="fas fa-list me-1"></i>Manage Items
+              </button>
+              <div>
+                <button 
+                  type="button" 
+                  class="btn btn-outline-secondary btn-sm me-1"
+                  (click)="navigateToEditMenu(menu._id)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button 
+                  type="button" 
+                  class="btn btn-outline-danger btn-sm"
+                  (click)="openDeleteModal(menu)"
+                  [disabled]="isDeletingMenu === menu._id">
+                  <span *ngIf="isDeletingMenu === menu._id" class="spinner-border spinner-border-sm me-1"></span>
+                  <i *ngIf="isDeletingMenu !== menu._id" class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="menus.length === 0" class="card shadow-sm">
+      <div class="card-body text-center py-5">
+        <i class="fas fa-utensils fa-3x text-muted mb-3"></i>
+        <h4>No Menus Yet</h4>
+        <p class="text-muted">
+          You haven't added any menus for this restaurant yet. Get started by creating your first menu!
+        </p>
+        <button type="button" class="btn btn-primary" (click)="navigateToCreateMenu()">
+          <i class="fas fa-plus me-2"></i>Add New Menu
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" 
+       [class.show]="menuToDelete" 
+       [style.display]="menuToDelete ? 'block' : 'none'"
+       tabindex="-1" 
+       aria-labelledby="deleteModalLabel" 
+       [attr.aria-hidden]="!menuToDelete">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+          <button type="button" class="btn-close" (click)="closeDeleteModal()" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete <strong>{{ menuToDelete?.name }}</strong>? 
+          This action will also delete all associated menu items and cannot be undone.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">
+            Cancel
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-danger"
+            (click)="confirmDeleteMenu()"
+            [disabled]="!!isDeletingMenu">
+            <span *ngIf="isDeletingMenu" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isDeletingMenu ? 'Deleting...' : 'Delete Menu' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div *ngIf="menuToDelete" class="modal-backdrop fade show" (click)="closeDeleteModal()"></div>
+</div>

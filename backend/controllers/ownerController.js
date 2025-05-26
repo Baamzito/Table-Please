@@ -159,54 +159,26 @@ ownerController.deleteRestaurant = async function (req, res) {
     }
 };
 
-ownerController.showRestaurantMenus = async function (req, res) {
+ownerController.getMenusByRestaurant = async function (req, res) {
     try {
         const restaurantId = req.params.restaurantId;
 
         if (!Types.ObjectId.isValid(restaurantId)) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(400).json({ message: 'Invalid restaurant ID.' });
         }
 
         const restaurant = await Restaurant.findById(restaurantId);
 
         if (!restaurant) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Restaurant not found.' });
         }
 
         const menus = await Menu.find({ restaurantId: restaurantId })
 
-        res.render('owner/restaurant-menus', {
-            title: `Menus for ${restaurant.name}`,
-            restaurant,
-            menus
-        })
+        return res.status(200).json({ menus });
     } catch (error) {
         console.log(error)
-        res.redirect('/owner/my-restaurants')
-    }
-};
-
-ownerController.showCreateMenu = async function (req, res) {
-    try {
-        const restaurantId = req.params.restaurantId;
-
-        if (!Types.ObjectId.isValid(restaurantId)) {
-            return res.redirect('/owner/my-restaurants');
-        }
-
-        const restaurant = await Restaurant.findById(restaurantId)
-
-        if (!restaurant) {
-            return res.redirect('/owner/my-restaurants');
-        }
-
-        res.render('owner/create-menu', {
-            title: 'Create New Menu',
-            restaurant
-        })
-    } catch (error) {
-        console.log(error)
-        res.redirect('/owner/my-restaurants')
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
@@ -215,13 +187,13 @@ ownerController.createMenu = async function (req, res) {
         const restaurantId = req.params.restaurantId;
 
         if (!Types.ObjectId.isValid(restaurantId)) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(400).json({ message: 'Invalid restaurant ID.' });
         }
 
         const restaurant = await Restaurant.findById(restaurantId);
 
         if (!restaurant) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Restaurant not found.' });
         }
 
         const { name, description, active } = req.body
@@ -231,11 +203,7 @@ ownerController.createMenu = async function (req, res) {
         if (!description || description.trim() === '') errors.push('Description is required.');
 
         if (errors.length > 0) {
-            return res.render('owner/create-menu', {
-                title: 'Create Menu',
-                restaurant: restaurant,
-                error: errors.join(' ')
-              });
+            return res.status(400).json({ message: errors.join(' ') });
         }
 
         const menu = await Menu.create({
@@ -245,19 +213,14 @@ ownerController.createMenu = async function (req, res) {
             active: active
         });
 
-        res.redirect(`/owner/restaurant/${req.params.restaurantId}/menus`);
+        return res.status(201).json({ message: 'Menu created successfully.', menu });
     } catch (error) {
         console.log(error)
-        res.render('owner/create-menu', {
-            title: 'Create New Menu',
-            restaurant: { _id: req.params.restaurantId },
-            body: req.body,
-            error: error.message
-        });
+        return res.status(500).json({ message: 'Internal server error.' });
     }
 };
 
-ownerController.showEditMenu = async function (req, res) {
+ownerController.getMenuById = async function (req, res) {
     try {
         const menuId = req.params.menuId;
 
@@ -277,14 +240,10 @@ ownerController.showEditMenu = async function (req, res) {
             return res.redirect('/owner/my-restaurants');
         }
 
-        res.render('owner/edit-menu', {
-            title: 'Edit Menu',
-            menu,
-            restaurant
-        });
+        return res.status(200).json({ menu });
     } catch (error) {
         console.error(error);
-        res.redirect('/owner/my-restaurants');
+        return res.status(500).json({ message: 'Internal server error.' });
     }
 };
 
@@ -293,19 +252,19 @@ ownerController.updateMenu = async function (req, res) {
         const menuId = req.params.menuId;
 
         if (!Types.ObjectId.isValid(menuId)) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(400).json({ error: 'Invalid menu ID.' });
         }
 
         const menu = await Menu.findById(menuId);
 
         if (!menu) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ error: 'Menu not found.' });
         }
 
         const restaurant = await Restaurant.findById(menu.restaurantId);
 
         if (!restaurant) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ error: 'Restaurant not found.' });
         }
 
         const { name, description } = req.body;
@@ -315,20 +274,15 @@ ownerController.updateMenu = async function (req, res) {
         if (!description || description.trim() === '') errors.push('Description is required.');
 
         if (errors.length > 0) {
-            return res.render('owner/edit-menu', {
-                title: 'Edit Menu',
-                menu: menu,
-                restaurant: restaurant,
-                error: errors.join(' ')
-              });
+            return res.status(400).json({ error: errors.join(' ') });
         }
 
         await Menu.findByIdAndUpdate(req.params.menuId, req.body);
 
-        res.redirect(`/owner/restaurant/${menu.restaurantId}/menus`);
+        res.status(200).json({ message: 'Menu updated successfully.' });
     } catch (error) {
         console.log(error)
-        res.redirect('/owner/my-restaurants');
+        res.status(500).json({ error: 'Internal server error.' });
     }
 };
 
@@ -337,93 +291,67 @@ ownerController.deleteMenu = async function (req, res) {
         const menuId = req.params.menuId;
 
         if (!Types.ObjectId.isValid(menuId)) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(400).json({ message: 'Invalid menu ID.' });
         }
 
         const menu = await Menu.findById(menuId);
 
         if (!menu) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Menu not found.' });
         }
 
         const restaurant = await Restaurant.findById(menu.restaurantId);
 
         if (!restaurant) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Restaurant not found.' });
         }
 
         await MenuItem.deleteMany({ menuId: menuId });
         await Menu.findByIdAndDelete(menuId);
 
-        res.redirect(`/owner/restaurant/${menu.restaurantId}/menus`);
+        return res.status(200).json({ message: 'Menu deleted successfully.' });
     } catch (error) {
         console.log(error);
-        res.redirect('/owner/my-restaurants');
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-ownerController.showMenuItems = async function (req, res) {
+ownerController.getMenuItemsByMenu = async function (req, res) {
     try {
         const menuId = req.params.menuId;
 
         if (!Types.ObjectId.isValid(menuId)) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(400).json({ message: 'Invalid menu ID.' });
         }
 
         const menu = await Menu.findById(menuId);
 
         if (!menu) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Menu not found.' });
         }
 
         const restaurant = await Restaurant.findById(menu.restaurantId);
 
         if (!restaurant) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Restaurant not found.' });
         }
 
-        const menuItems = await MenuItem.find({ menuId: req.params.menuId });
+        const rawMenuItems = await MenuItem.find({ menuId });
+        const baseUrl = 'http://localhost:3000/';
 
-        res.render('owner/menu-items', {
-            title: `Items in ${menu.name}`,
-            menu,
-            restaurant,
-            menuItems
-        });
+        const menuItems = [];
+        for (let item of rawMenuItems) {
+        const plainItem = item.toObject();
+        if (plainItem.image) {
+            plainItem.image = baseUrl + plainItem.image;
+        }
+        menuItems.push(plainItem);
+        }
+
+        return res.status(200).json({ menuItems });
     } catch (error) {
         console.log(error)
-        res.redirect('/owner/my-restaurants');
-    }
-};
-
-ownerController.showCreateMenuItem = async function (req, res) {
-    try {
-        const menuId = req.params.menuId;
-
-        if (!Types.ObjectId.isValid(menuId)) {
-            return res.redirect('/owner/my-restaurants');
-        }
-
-        const menu = await Menu.findById(menuId);
-
-        if (!menu) {
-            return res.redirect('/owner/my-restaurants');
-        }
-
-        const restaurant = await Restaurant.findById(menu.restaurantId);
-
-        if (!restaurant) {
-            return res.redirect('/owner/my-restaurants');
-        }
-
-        res.render('owner/create-menu-item', {
-            title: 'Add New Menu Item',
-            menu,
-            restaurant
-        });
-    } catch (error) {
-        console.log(error)
-        res.redirect('/owner/my-restaurants');
+        res.status(500).json({ message: 'Internal server error.' });
     }
 };
 
@@ -432,19 +360,19 @@ ownerController.createMenuItem = async function (req, res) {
         const menuId = req.params.menuId;
 
         if (!Types.ObjectId.isValid(menuId)) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(400).json({ message: 'Invalid menu ID.' });
         }
 
         const menu = await Menu.findById(menuId);
 
         if (!menu) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Menu not found.' });
         }
 
         const restaurant = await Restaurant.findById(menu.restaurantId);
 
         if (!restaurant) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Restaurant not found.' });
         }
 
         const { name, description, category, available, price } = req.body;
@@ -475,12 +403,7 @@ ownerController.createMenuItem = async function (req, res) {
         }
 
         if (errors.length > 0) {
-            return res.render('owner/create-menu-item', {
-                title: 'Add New Menu Item',
-                menu,
-                restaurant,
-                error: errors
-            });
+            return res.status(400).json({ message: 'Validation errors.', errors });
         }
 
         let imagePath = null;
@@ -499,48 +422,47 @@ ownerController.createMenuItem = async function (req, res) {
             image: imagePath
         })
 
-        res.redirect(`/owner/menu/${req.params.menuId}/items`);
+        return res.status(201).json({ message: 'Menu item created successfully.' });
     } catch (error) {
         console.log(error); 
         return res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
-ownerController.showEditMenuItem = async function (req, res) {
+ownerController.getMenuItemById = async function (req, res) {
     try {
         const itemId = req.params.itemId;
 
         if (!Types.ObjectId.isValid(itemId)) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(400).json({ message: 'Invalid item ID.' });
         }
 
         const menuItem = await MenuItem.findById(itemId);
 
         if (!menuItem) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Menu item not found.' });
         }
 
         const menu = await Menu.findById(menuItem.menuId);
 
         if (!menu) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Menu not found.' });
         }
 
         const restaurant = await Restaurant.findById(menu.restaurantId);
 
         if (!restaurant) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Restaurant not found.' });
         }
 
-        res.render('owner/edit-menu-item', {
-            title: 'Edit Menu Item',
-            menuItem,
-            menu,
-            restaurant
-        });
+        if (menuItem.image) {
+            menuItem.image = `${process.env.BASE_URL}${menuItem.image}`;
+        }
+
+        return res.status(200).json({ menuItem });
     } catch (error) {
         console.log(error)
-        res.redirect('/owner/my-restaurants');
+        return res.status(500).json({ message: 'Internal server error.' });
     }
 };
 
@@ -549,25 +471,25 @@ ownerController.updateMenuItem = async function (req, res) {
         const itemId =  req.params.itemId;
 
         if (!Types.ObjectId.isValid(itemId)) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(400).json({ message: 'Invalid menu item ID.' });
         }
 
         const menuItem = await MenuItem.findById(itemId);
 
         if (!menuItem) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Menu item not found.' });
         }
 
         const menu = await Menu.findById(menuItem.menuId);
 
         if (!menu) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Menu not found.' });
         }
 
         const restaurant = await Restaurant.findById(menu.restaurantId);
 
         if (!restaurant) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Restaurant not found.' });
         }
 
         const { name, description, price, category, available, itemInfo_calories, itemInfo_proteins, itemInfo_fats, itemInfo_carbohydrates, itemInfo_fiber, itemInfo_sodium } = req.body;
@@ -593,13 +515,7 @@ ownerController.updateMenuItem = async function (req, res) {
         });
 
         if (errors.length > 0) {
-            return res.render('owner/edit-menu-item', {
-                title: 'Edit Menu Item',
-                menuItem,
-                menu,
-                restaurant,
-                error: errors
-            });
+            return res.status(400).json({ message: 'Validation errors.', errors });
         }
 
         const updateData = {
@@ -624,9 +540,10 @@ ownerController.updateMenuItem = async function (req, res) {
 
         await MenuItem.findByIdAndUpdate(req.params.itemId, updateData);
 
-        res.redirect(`/owner/menu/${menuItem.menuId}/items`);
+        return res.status(200).json({ message: 'Menu item updated successfully.' });
     } catch (error) {
         console.log(error);
+        return res.status(500).json({ message: 'Internal server error.' });
     }
 };
 
@@ -635,25 +552,25 @@ ownerController.deleteMenuItem = async function (req, res) {
         const itemId =  req.params.itemId;
 
         if (!Types.ObjectId.isValid(itemId)) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(400).json({ message: 'Invalid item ID.' });
         }
 
         const menuItem = await MenuItem.findById(itemId);
         
         if (!menuItem) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Menu item not found.' });
         }
 
         const menu = await Menu.findById(menuItem.menuId);
 
         if (!menu) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Menu not found.' });
         }
 
         const restaurant = await Restaurant.findById(menu.restaurantId);
 
         if (!restaurant) {
-            return res.redirect('/owner/my-restaurants');
+            return res.status(404).json({ message: 'Restaurant not found.' });
         }
 
         if (menuItem.image) {
@@ -666,9 +583,10 @@ ownerController.deleteMenuItem = async function (req, res) {
 
         await MenuItem.findByIdAndDelete(req.params.itemId);
 
-        res.redirect(`/owner/menu/${menuItem.menuId}/items`);
+        return res.status(200).json({ message: 'Menu item deleted successfully.' });
     } catch (error) {
         console.log(error);
+        return res.status(500).json({ message: 'Internal server error.' });
     }
 };
 
