@@ -1,0 +1,92 @@
+<div class="d-flex flex-column min-vh-100 bg-light">
+  <!-- Page content -->
+  <div class="flex-grow-1">
+    
+    <!-- Cart Header -->
+    <section class="hero-section position-relative" style="background-image: url('/images/cart-header.jpg'); background-size: cover; height: 300px;">
+      <div class="position-absolute w-100 h-100" style="background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7));"></div>
+      <div class="container position-relative h-100 d-flex align-items-end pb-4">
+        <div class="text-white mb-3">
+          <h1 class="display-5 fw-bold">My Cart</h1>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cart Content -->
+    <section class="py-4">
+      <div class="container">
+        <div class="row g-4">
+          <!-- Main Cart Items -->
+          <div class="col-lg-8">
+            <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+            <div *ngIf="loading" class="text-center py-5">
+              <div class="spinner-border text-primary" role="status"></div>
+            </div>
+
+            <div *ngIf="!loading && cartItems.length === 0" class="alert alert-info">
+              Your cart is currently empty.
+            </div>
+
+            <div *ngIf="cartItems.length > 0">
+              <div *ngFor="let item of cartItems" class="card shadow-sm border-0 overflow-hidden mb-4">
+                <div class="row g-0 align-items-center">
+                  <div class="col-md-3">
+                    <img *ngIf="item.menuItem.image; else noImage" [src]="item.menuItem.image" class="img-fluid h-100 w-100 object-fit-cover" alt="{{ item.menuItem.name }}">
+                    <ng-template #noImage>
+                      <div class="bg-light d-flex align-items-center justify-content-center h-100" style="min-height: 100px;">
+                        <i class="fas fa-utensils fa-2x text-secondary opacity-50"></i>
+                      </div>
+                    </ng-template>
+                  </div>
+                  <div class="col-md-9">
+                    <div class="card-body">
+                      <h5 class="card-title mb-1">{{ item.menuItem.name }}</h5>
+                      <p class="card-text text-muted small mb-2">{{ item.menuItem.description }}</p>
+
+                      <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="fw-bold text-primary">${{ item.price | number:'1.2-2' }}</span>
+                        <input type="number" min="1" class="form-control w-auto"
+                              [value]="item.quantity" (change)="onQuantityChange(item, $event)">
+                      </div>
+
+                      <div class="text-end">
+                        <button class="btn btn-outline-danger btn-sm" (click)="removeItem(item)">
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cart Sidebar -->
+          <div class="col-lg-4">
+            <div class="sticky-top" style="top: 80px;">
+              <div class="card shadow border-0 overflow-hidden mb-4">
+                <div class="card-body p-4">
+                  <h4 class="card-title mb-3">
+                    <i class="fas fa-shopping-cart me-2 text-primary"></i>Summary
+                  </h4>
+                  <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item d-flex justify-content-between px-0 py-2">
+                      <span>Total</span>
+                      <strong>${{ getTotal() | number:'1.2-2' }}</strong>
+                    </li>
+                  </ul>
+                  <div class="d-grid gap-2">
+                    <button class="btn btn-outline-secondary" (click)="clearCart()">Clear Cart</button>
+                    <button class="btn btn-primary" (click)="goToCheckout()">Proceed to Checkout</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>

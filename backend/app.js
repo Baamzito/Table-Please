@@ -6,13 +6,13 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const authMiddleware = require('./middleware/authMiddleware');
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/authRoutes');
 const restaurantsRouter = require('./routes/restaurantRoutes');
 const profileRouter = require('./routes/profileRoutes');
 const adminRouter = require('./routes/adminRoutes');
-const ownerRouter = require('./routes/ownerRoutes')
+const ownerRouter = require('./routes/ownerRoutes');
+const cartRouter = require('./routes/cartRoutes');
 
 const app = express();
 
@@ -54,6 +54,7 @@ app.use('/restaurants', restaurantsRouter);
 app.use('/profile', profileRouter);
 app.use('/admin', adminRouter);
 app.use('/owner', ownerRouter);
+app.use('/cart', cartRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,11 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { RestaurantService } from '../../../services/restaurant.service';
+import { CartService } from '../../../services/cart.service';
+import { AuthService } from '../../../services/auth.service';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-restaurant-detail',
-  imports: [CommonModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './restaurant-detail.component.html',
   styleUrl: './restaurant-detail.component.css'
 })
@@ -14,10 +18,14 @@ export class RestaurantDetailComponent implements OnInit {
   menus: any[] = [];
   error = '';
   selectedModalItem: any = null;
+  quantities: { [menuItemId: string]: number } = {};
+  successMessage = '';
 
   constructor(
     private route: ActivatedRoute,
-    private restaurantService: RestaurantService
+    private restaurantService: RestaurantService,
+    private cartService: CartService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -45,7 +53,7 @@ export class RestaurantDetailComponent implements OnInit {
   getCategorizedItems(menu: any): any {
     const categories: any = {};
     const menuItems = menu.items || [];
-   
+
     menuItems.forEach((item: any) => {
       if (item.available !== false) {
         if (!categories[item.category]) {
@@ -54,7 +62,7 @@ export class RestaurantDetailComponent implements OnInit {
         categories[item.category].push(item);
       }
     });
-   
+
     return categories;
   }
 
@@ -63,7 +71,6 @@ export class RestaurantDetailComponent implements OnInit {
     return Object.keys(categories).filter(category => categories[category].length > 0);
   }
 
-  // Add this new method to handle the ID generation
   getCategoryId(menuId: string, categoryName: string): string {
     return `menu-${menuId}-${categoryName.toLowerCase().replace(/\s+/g, '-')}`;
   }
@@ -75,7 +82,7 @@ export class RestaurantDetailComponent implements OnInit {
       modalElement.style.display = 'block';
       modalElement.classList.add('show');
       document.body.classList.add('modal-open');
-     
+
       let backdrop = document.querySelector('.modal-backdrop');
       if (!backdrop) {
         backdrop = document.createElement('div');
@@ -103,5 +110,28 @@ export class RestaurantDetailComponent implements OnInit {
     if (event.target === event.currentTarget) {
       this.closeModal();
     }
+  }
+
+  addToCart(item: any): void {
+    const quantity = this.quantities[item._id] || 1;
+
+    this.cartService.addItem({ menuItemId: item._id, quantity }).subscribe({
+      next: () => {
+        this.successMessage = `"${item.name}" added to cart.`;
+        this.error = '';
+        setTimeout(() => this.successMessage = '', 3000);
+      },
+      error: err => {
+        console.error(err);
+        this.successMessage = '';
+        this.error = err.error?.message || 'Failed to add item to cart.';
+        setTimeout(() => this.error = '', 4000);
+      }
+    });
+  }
+
+  isCustomer(): boolean {
+    const user = this.authService.getUser();
+    return user?.role === 'customer';
   }
 }

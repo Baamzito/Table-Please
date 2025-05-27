@@ -32,6 +32,10 @@ export class NavbarComponent {
     return this.authService.isLoggedIn();
   }
 
+  isCustomer(){
+    return this.user && this.user.role === 'customer';
+  }
+
   logout(){
     this.user = null;
     this.authService.logout();

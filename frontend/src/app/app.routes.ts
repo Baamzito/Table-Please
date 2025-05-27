@@ -17,6 +17,7 @@ import { OwnerEditMenuComponent } from './components/owner/owner-edit-menu/owner
 import { OwnerMenuItemsComponent } from './components/owner/owner-menu-items/owner-menu-items.component';
 import { OwnerCreateMenuItemsComponent } from './components/owner/owner-create-menu-items/owner-create-menu-items.component';
 import { OwnerEditMenuItemsComponent } from './components/owner/owner-edit-menu-items/owner-edit-menu-items.component';
+import { CartComponent } from './components/cart/cart.component';
 
 
 export const routes: Routes = [
@@ -52,5 +53,6 @@ export const routes: Routes = [
         { path: 'restaurants/:id/menus/:menuId/items/create', component: OwnerCreateMenuItemsComponent},
         { path: 'restaurants/:id/menus/:menuId/items/:itemId/edit', component: OwnerEditMenuItemsComponent}
       ]
-    }
+    },
+    { path: 'cart', canActivate: [authGuard], component: CartComponent}
 ];

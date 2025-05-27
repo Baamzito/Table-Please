@@ -15,6 +15,14 @@
       </ul>
      
       <div class="d-flex align-items-center">
+        <!-- Botão do Carrinho - Visível apenas para customers logados -->
+        <div *ngIf="isLoggedIn() && isCustomer()" class="me-3">
+          <a routerLink="/cart" class="btn btn-outline-secondary d-flex align-items-center">
+            <i class="fas fa-shopping-cart me-1"></i>
+            Cart
+          </a>
+        </div>
+
         <div *ngIf="isLoggedIn()" class="dropdown">
           {{ getUser() }}
           <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" type="button" id="userMenuDropdown"
