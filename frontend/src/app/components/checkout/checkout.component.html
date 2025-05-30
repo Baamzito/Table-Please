@@ -1,0 +1,92 @@
+<section class="pt-5 mt-5 bg-light min-vh-100">
+  <div class="container">
+    <div class="row">
+      <!-- Checkout Form -->
+      <div class="col-lg-8 col-xl-6">
+        <div class="card shadow border-0">
+          <div class="card-body p-5">
+            <h2 class="mb-4">Checkout</h2>
+
+            <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+            <form [formGroup]="checkoutForm" (ngSubmit)="submitOrder()">
+              <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input formControlName="name" type="text" class="form-control" placeholder="Your full name">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Address</label>
+                <input formControlName="address" type="text" class="form-control" placeholder="Street address">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">City</label>
+                <input formControlName="city" type="text" class="form-control" placeholder="City">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Postal Code</label>
+                <input formControlName="postalCode" type="text" class="form-control" placeholder="Postal code">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Phone Number</label>
+                <input formControlName="phone" type="tel" class="form-control" placeholder="Phone number">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Citizen Card Number</label>
+                <input formControlName="citizenCardNumber" type="text" class="form-control" placeholder="CC Number">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Order Type</label>
+                <select formControlName="type" class="form-select">
+                  <option value="delivery">Delivery</option>
+                  <option value="dine-in">Dine-In</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Payment Method</label>
+                <select formControlName="paymentMethod" class="form-select">
+                  <option value="cash">Cash</option>
+                  <option value="credit_card">Credit Card</option>
+                </select>
+              </div>
+
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary" [disabled]="submitting || cartItems.length === 0">
+                  {{ submitting ? 'Placing Order...' : 'Place Order' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="col-lg-4 mt-4 mt-lg-0">
+        <div class="card shadow border-0">
+          <div class="card-body p-4">
+            <h4 class="mb-3">Order Summary</h4>
+            <ul class="list-group list-group-flush">
+              <li *ngFor="let item of cartItems" class="list-group-item d-flex justify-content-between">
+                <div>
+                  <strong>{{ item.menuItem.name }}</strong><br>
+                  <small class="text-muted">Qty: {{ item.quantity }}</small>
+                </div>
+                <span>${{ (item.price * item.quantity) | number:'1.2-2' }}</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between fw-bold">
+                <span>Total</span>
+                <span>${{ getTotal() | number:'1.2-2' }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

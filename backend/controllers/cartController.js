@@ -158,7 +158,13 @@ cartController.clearCart = async (req, res) => {
 cartController.submitCart = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { deliveryDetails, type, paymentMethod } = req.body;
+    const {
+      deliveryDetails,
+      contact,
+      type,
+      paymentMethod,
+      citizenCardNumber
+    } = req.body;
 
     const cart = await Cart.findOne({ userId }).populate('items.menuItem');
     if (!cart || cart.items.length === 0) {
@@ -186,14 +192,25 @@ cartController.submitCart = async (req, res) => {
       items: orderItems,
       totalPrice,
       deliveryDetails,
+      contact,
       type,
       paymentMethod,
-      paymentStatus: 'pending',
+      citizenCardNumber,
+      paymentStatus: 'paid',
       status: 'pending'
     });
 
     cart.items = [];
     await cart.save();
+
+    const io = req.app.get('io');
+    io.to(restaurantId.toString()).emit('newOrder', {
+      orderId: order._id,
+      restaurantId: restaurantId.toString(),
+      total: totalPrice,
+      type,
+      contact
+    });
 
     res.status(200).json({ message: 'Order submitted successfully.', order });
   } catch (err) {

@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('paw2425-grupo19:server');
 var http = require('http');
+const { Server } = require('socket.io');
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +21,29 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:4200',
+    methods: ['GET', 'POST', 'PUT'],
+    credentials: true
+  }
+});
+
+app.set('io', io);
+
+io.on('connection', socket => {
+  console.log('Socket connected:', socket.id);
+
+  socket.on('joinRestaurantRoom', (restaurantId) => {
+    socket.join(restaurantId);
+    console.log(`Socket ${socket.id} joined room ${restaurantId}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Socket disconnected:', socket.id);
+  });
+});
 
 /**
  * Listen on provided port, on all network interfaces.

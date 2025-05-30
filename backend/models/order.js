@@ -32,22 +32,36 @@ const orderSchema = new mongoose.Schema({
   },
   deliveryDetails: {
     address: { type: String },
-    notes: { type: String },
-    contactPhone: { type: String },
+    city: { type: String, default: null },
+    postalCode: { type: String, default: null },
+  },
+  contact: {
+    type: String,
+    required: true,
+    match: [/^\+?\d{9,15}$/, "Invalid phone number format"]
   },
   type: {
     type: String,
-    enum: ['dine-in', 'takeaway', 'delivery'],
+    enum: ['dine-in', 'delivery'],
     required: true
   },
   paymentMethod: {
     type: String,
-    enum: ['cash', 'credit_card', 'paypal', 'mbway'],
+    enum: ['cash', 'credit_card'],
     required: true
+  },
+  citizenCardNumber: {
+    type: String,
+    required: false  
   },
   paymentStatus: {
     type: String,
-    enum: ['pending', 'paid', 'failed', 'refunded'],
+    enum: ['pending', 'paid'],
+    default: 'pending'
+  },
+  deliveryStatus: {
+    type: String,
+    enum: ['pending', 'confirmed', 'inProgress', 'outForDelivery', 'delivered', 'cancelled'],
     default: 'pending'
   },
   review: {

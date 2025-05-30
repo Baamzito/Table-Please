@@ -88,6 +88,7 @@ export class CartComponent implements OnInit {
   }
 
   goToCheckout() {
+    if (this.cartItems.length === 0) return;
     this.router.navigate(['/checkout']);
   }
 }

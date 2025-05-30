@@ -18,171 +18,102 @@ profileController.showProfile = async function (req, res) {
         return res.json(user)
     } catch (error) {
         console.log(error);
-        res.status(500).send('Internal error fetching profile data.');
-    }
-}
-
-profileController.showEditProfile = async function (req, res) {
-    try {
-        const userData = await User.findById(req.user.id);
-        res.render('profile/profile-edit', { title: 'Profile Edit', user: userData });
-    } catch (error) {
-        res.status(500).send('Error fetching profile data.');
+        res.status(500).send('Internal server error');
     }
 }
 
 profileController.updateProfile = async function (req, res) {
-    try {
-        const userId = req.user.id;
-        const { firstName, lastName, username, email, address_street, address_city, address_postalCode } = req.body;
+  try {
+    const userId = req.user.id;
+    const { firstName, lastName, username, email, address_street, address_city, address_postalCode } = req.body;
 
-        if (!username || typeof username !== 'string' || username.trim().length < 5) {
-            return res.render('profile/profile-edit', {
-                title: 'Profile Edit',
-                error: 'Username is required and must be at least 5 characters long.',
-                user: await User.findById(userId)
-            });
-        }
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email || !emailRegex.test(email)) {
-            return res.render('profile/profile-edit', {
-                title: 'Profile Edit',
-                error: 'Please enter a valid email address.',
-                user: await User.findById(userId)
-            });
-        }
-
-        if (!firstName || typeof firstName !== 'string' || firstName.trim() === '') {
-            return res.render('profile/profile-edit', {
-                title: 'Profile Edit',
-                error: 'First name is required.',
-                user: await User.findById(userId)
-            });
-        }
-
-        if (!lastName || typeof lastName !== 'string' || lastName.trim() === '') {
-            return res.render('profile/profile-edit', {
-                title: 'Profile Edit',
-                error: 'Last name is required.',
-                user: await User.findById(userId)
-            });
-        }
-
-        if (address_street && typeof address_street !== 'string') {
-            return res.render('profile/profile-edit', {
-                title: 'Profile Edit',
-                error: 'Street address must be valid text.',
-                user: await User.findById(userId)
-            });
-        }
-
-        if (address_city && typeof address_city !== 'string') {
-            return res.render('profile/profile-edit', {
-                title: 'Profile Edit',
-                error: 'City must be valid text.',
-                user: await User.findById(userId)
-            });
-        }
-
-        if (address_postalCode) {
-            const postalRegex = /^[0-9]{4}-[0-9]{3}$/;
-            if (!postalRegex.test(address_postalCode)) {
-                return res.render('profile/profile-edit', {
-                    title: 'Profile Edit',
-                    error: 'Please enter a valid postal code in format XXXX-XXX.',
-                    user: await User.findById(userId)
-                });
-            }
-        }
-
-
-        const existingUsername = await User.findOne({ username, _id: { $ne: userId } });
-        if (existingUsername) {
-            return res.render('profile/profile-edit', {
-                title: 'Profile Edit',
-                error: 'Username already exists. Please choose another one.',
-                user: await User.findById(userId)
-            });
-        }
-
-        const existingEmail = await User.findOne({ email, _id: { $ne: userId } });
-        if (existingEmail) {
-            return res.render('profile/profile-edit', {
-                title: 'Profile Edit',
-                error: 'Email already registered. Please use another email.',
-                user: await User.findById(userId)
-            });
-        }
-
-        const updateData = {
-            firstName,
-            lastName,
-            username,
-            email,
-            address: {
-                street: address_street || '',
-                city: address_city || '',
-                postalCode: address_postalCode || ''
-            }
-        }
-
-        if (req.file) {
-            updateData.profileImage = '/uploads/' + req.file.filename;
-
-            const oldUser = await User.findById(userId);
-            if (oldUser.profileImage && oldUser.profileImage !== '/images/default-avatar.jpg') {
-                const oldImagePath = path.join(__dirname, '..', 'public', oldUser.profileImage);
-                if (fs.existsSync(oldImagePath)) {
-                    fs.unlinkSync(oldImagePath);
-                }
-            }
-        } else if (req.body.removeImage === 'true') {
-            const oldUser = await User.findById(userId);
-
-            if (oldUser.profileImage && oldUser.profileImage !== '/images/default-avatar.jpg') {
-                const oldImagePath = path.join(__dirname, '..', 'public', oldUser.profileImage);
-                if (fs.existsSync(oldImagePath)) {
-                    fs.unlinkSync(oldImagePath);
-                }
-            }
-            updateData.profileImage = '/images/default-avatar.jpg';
-        }
-
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            { $set: updateData },
-            { new: true, runValidators: true }
-        );
-
-        if (!updatedUser) {
-            return res.status(404).send('User not found.');
-        }
-
-        res.redirect('/profile');
-    } catch (error) {
-        console.error('Error updating profile: ', error);
-        try {
-            const userData = await User.findById(req.user.id);
-            return res.render('profile/profile-edit', {
-                title: 'Profile Edit',
-                error: 'Error updating profile: ' + error.message,
-                user: userData
-            });
-        } catch (secError) {
-            return res.status(500).send('Error updating profile: ' + error.message);
-        }
+    if (!username || typeof username !== 'string' || username.trim().length < 5) {
+      return res.status(400).json({ error: 'Username must be at least 5 characters.' });
     }
-}
 
-profileController.showChangePassword = async function (req, res) {
-    try {
-        const userData = await User.findById(req.user.id);
-        res.render('profile/change-password', { title: 'Change Password', user: userData });
-    } catch (error) {
-        res.status(500).send('Error loading password change page');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Invalid email format.' });
     }
-}
+
+    if (!firstName || typeof firstName !== 'string' || firstName.trim() === '') {
+      return res.status(400).json({ error: 'First name is required.' });
+    }
+
+    if (!lastName || typeof lastName !== 'string' || lastName.trim() === '') {
+      return res.status(400).json({ error: 'Last name is required.' });
+    }
+
+    if (address_street && typeof address_street !== 'string') {
+      return res.status(400).json({ error: 'Street address must be valid text.' });
+    }
+
+    if (address_city && typeof address_city !== 'string') {
+      return res.status(400).json({ error: 'City must be valid text.' });
+    }
+
+    if (address_postalCode) {
+      const postalRegex = /^[0-9]{4}-[0-9]{3}$/;
+      if (!postalRegex.test(address_postalCode)) {
+        return res.status(400).json({ error: 'Invalid postal code format. Use XXXX-XXX.' });
+      }
+    }
+
+    const existingUsername = await User.findOne({ username, _id: { $ne: userId } });
+    if (existingUsername) {
+      return res.status(409).json({ error: 'Username already exists.' });
+    }
+
+    const existingEmail = await User.findOne({ email, _id: { $ne: userId } });
+    if (existingEmail) {
+      return res.status(409).json({ error: 'Email already in use.' });
+    }
+
+    const updateData = {
+      firstName,
+      lastName,
+      username,
+      email,
+      address: {
+        street: address_street || '',
+        city: address_city || '',
+        postalCode: address_postalCode || ''
+      }
+    };
+
+    const oldUser = await User.findById(userId);
+
+    if (req.file) {
+      updateData.profileImage = '/uploads/' + req.file.filename;
+
+      if (oldUser.profileImage && oldUser.profileImage !== '/images/default-avatar.jpg') {
+        const oldImagePath = path.join(__dirname, '..', 'public', oldUser.profileImage);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+    } else if (req.body.removeImage === 'true') {
+      if (oldUser.profileImage && oldUser.profileImage !== '/images/default-avatar.jpg') {
+        const oldImagePath = path.join(__dirname, '..', 'public', oldUser.profileImage);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+      updateData.profileImage = '/images/default-avatar.jpg';
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, { $set: updateData }, { new: true, runValidators: true });
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    res.status(200).json({ message: 'Profile updated successfully.', user: updatedUser });
+  } catch (error) {
+    console.error('Error updating profile: ', error);
+    res.status(500).json({ error: 'Error updating profile.' });
+  }
+};
 
 profileController.updatePassword = async function (req, res) {
     try {

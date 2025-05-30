@@ -1,0 +1,138 @@
+<div class="container mt-5 pt-5" style="min-height: calc(100vh - 150px)">
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <h2 class="mb-4">Administration Panel</h2>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title">Validated Restaurant Owners</h5>
+          <p class="display-4 mb-3">{{ validatedUsersCount }}</p>
+          <a routerLink="/admin/validated-restaurant-owners" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title">Pending Restaurant Owners</h5>
+          <p class="display-4 mb-3">{{ pendingUsersCount }}</p>
+          <button class="btn btn-sm btn-outline-primary" disabled>View All</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title">Total Restaurants</h5>
+          <p class="display-4 mb-3">{{ totalRestaurantsCount }}</p>
+          <a routerLink="/admin/restaurants" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pending Users Table -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <h5 class="card-title mb-0">Users With Restaurant Role Pending Validation</h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="pendingUsers.length > 0" class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Profile</th>
+              <th>Name</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Registration Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of pendingUsers">
+              <td><img [src]="user.profileImage || '/assets/default-avatar.jpg'" class="rounded-circle" width="40" height="40"></td>
+              <td>{{ user.firstName }} {{ user.lastName }}</td>
+              <td>{{ '@' + user.username }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.createdAt | date:'mediumDate' }}</td>
+              <td>
+                <button class="btn btn-sm btn-success me-2" (click)="validateUser(user._id)">
+                  <i class="fas fa-check"></i> Validate
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="pendingUsers.length === 0" class="text-center py-4">
+        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+        <h6 class="text-muted">No restaurant owners pending validation</h6>
+      </div>
+    </div>
+  </div>
+
+  <!-- Restaurant Management -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <h5 class="card-title mb-0">Restaurant Management</h5>
+      <button class="btn btn-sm btn-primary" (click)="goToAddRestaurant()">
+        <i class="fas fa-plus me-1"></i> Add Restaurant
+      </button>
+    </div>
+    <div class="card-body">
+      <div *ngIf="restaurantsList.length > 0" class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Restaurant Name</th>
+              <th>Owner</th>
+              <th>Location</th>
+              <th>Contact</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let restaurant of restaurantsList">
+              <td>{{ restaurant.name }}</td>
+              <td>
+                <div *ngIf="restaurant.owner; else noOwner">
+                  <img [src]="restaurant.owner.profileImage || '/assets/default-avatar.jpg'" width="30" height="30" class="rounded-circle me-2">
+                  {{ restaurant.owner.firstName }} {{ restaurant.owner.lastName }}
+                </div>
+                <ng-template #noOwner><span class="text-muted">No owner assigned</span></ng-template>
+              </td>
+              <td>
+                <span *ngIf="restaurant.address && restaurant.address.city; else noLocation">
+                  <i class="fas fa-map-marker-alt me-1"></i> {{ restaurant.address.city }}
+                </span>
+                <ng-template #noLocation><span class="text-muted">No location</span></ng-template>
+              </td>
+              <td>
+                <span *ngIf="restaurant.contact?.phone; else noContact">
+                  <i class="fas fa-phone me-1"></i> {{ restaurant.contact.phone }}
+                </span>
+                <ng-template #noContact><span class="text-muted">No contact</span></ng-template>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary me-1" (click)="goToEditRestaurant(restaurant._id)">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteRestaurant(restaurant._id)">
+                  <i class="fas fa-trash"></i> Remove
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="restaurantsList.length === 0" class="text-center py-5">
+        <i class="fas fa-utensils fa-3x text-secondary mb-3"></i>
+        <h6 class="text-muted">No restaurants found</h6>
+      </div>
+    </div>
+  </div>
+</div>

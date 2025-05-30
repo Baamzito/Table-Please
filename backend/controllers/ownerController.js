@@ -70,61 +70,66 @@ ownerController.getRestaurantById = async function (req, res) {
 };
 
 ownerController.updateRestaurant = async function (req, res) {
-    try {
-        const { name, address_street, address_city, address_postcode, contact_phone, contact_email } = req.body;
+  try {
+    const {
+      name,
+      address_street,
+      address_city,
+      address_postcode,
+      contact_phone,
+      contact_email,
+      settings_preparationTime,
+      settings_deliveryTime
+    } = req.body;
 
-        const errors = [];
+    const errors = [];
 
-        if (!name || name.trim() === '') errors.push('Name is required.');
-        if (!address_street || address_street.trim() === '') errors.push('Street is required.');
-        if (!address_city || address_city.trim() === '') errors.push('City is required.');
-        if (!address_postcode || address_postcode.trim() === '') errors.push('Postcode is required.');
-        if (!contact_phone || contact_phone.trim() === '') errors.push('Phone is required.');
+    if (!name || name.trim() === '') errors.push('Name is required.');
+    if (!address_street || address_street.trim() === '') errors.push('Street is required.');
+    if (!address_city || address_city.trim() === '') errors.push('City is required.');
+    if (!address_postcode || address_postcode.trim() === '') errors.push('Postcode is required.');
+    if (!contact_phone || contact_phone.trim() === '') errors.push('Phone is required.');
 
-        if (contact_email && !/.+@.+\..+/.test(contact_email)) {
-            errors.push('Invalid email format.');
-        }
-
-        if (errors.length > 0) {
-            return res.render('owner/edit-restaurant', {
-                title: 'Edit Restaurant',
-                restaurant: {
-                  _id: req.params.id,
-                  name,
-                  address: {
-                    street: address_street,
-                    city: address_city,
-                    postcode: address_postcode
-                  },
-                  contact: {
-                    phone: contact_phone,
-                    email: contact_email
-                  }
-                },
-                error: errors.join(' ')
-              });
-        }
-      
-          const updatedData = {
-            name,
-            address: {
-              street: address_street,
-              city: address_city,
-              postcode: address_postcode
-            },
-            contact: {
-              phone: contact_phone,
-              email: contact_email
-            }
-          };
-      
-          await Restaurant.findByIdAndUpdate(req.params.id, updatedData, { new: true });
-      
-          return res.status(200).json({ message: 'Restaurant updated successfully.' });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal Server Error" });
+    if (contact_email && !/.+@.+\..+/.test(contact_email)) {
+      errors.push('Invalid email format.');
     }
+
+    if (!settings_preparationTime || isNaN(settings_preparationTime) || settings_preparationTime <= 0) {
+      errors.push('Preparation time must be a number greater than 0.');
+    }
+
+    if (!settings_deliveryTime || isNaN(settings_deliveryTime) || settings_deliveryTime <= 0) {
+      errors.push('Delivery time must be a number greater than 0.');
+    }
+
+    if (errors.length > 0) {
+      return res.status(400).json({ message: errors.join(' ') });
+    }
+
+    const updatedData = {
+      name,
+      address: {
+        street: address_street,
+        city: address_city,
+        postcode: address_postcode
+      },
+      contact: {
+        phone: contact_phone,
+        email: contact_email
+      },
+      settings: {
+        preparationTime: settings_preparationTime,
+        deliveryTime: settings_deliveryTime
+      }
+    };
+
+    await Restaurant.findByIdAndUpdate(req.params.id, updatedData, { new: true });
+
+    return res.status(200).json({ message: 'Restaurant updated successfully.' });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 
 ownerController.deleteRestaurant = async function (req, res) {
@@ -375,9 +380,13 @@ ownerController.createMenuItem = async function (req, res) {
             return res.status(404).json({ message: 'Restaurant not found.' });
         }
 
-        const { name, description, category, available, price } = req.body;
+        const itemCount = await MenuItem.countDocuments({ menuId });
+        if (itemCount >= 10) {
+            return res.status(400).json({ message: 'Each menu can only have up to 10 items.' });
+        }
 
-        const errors = []
+        const { name, description, category, available, price } = req.body;
+        const errors = [];
 
         if (!name || name.trim() === '') errors.push('Name is required.');
         if (!description || description.trim() === '') errors.push('Description is required.');
@@ -394,7 +403,7 @@ ownerController.createMenuItem = async function (req, res) {
 
         Object.keys(itemInfo).forEach(key => {
             if (itemInfo[key] === null || isNaN(itemInfo[key])) {
-                errors.push(`${key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()} is required and must be a valid number.`);
+                errors.push(`${key.charAt(0).toUpperCase() + key.slice(1)} is required and must be a valid number.`);
             }
         });
 
@@ -406,28 +415,26 @@ ownerController.createMenuItem = async function (req, res) {
             return res.status(400).json({ message: 'Validation errors.', errors });
         }
 
-        let imagePath = null;
-        if (req.file) {
-            imagePath = '/uploads/' + req.file.filename;
-        }
+        const imagePath = '/uploads/' + req.file.filename;
 
         await MenuItem.create({
-            name: name,
-            description: description,
-            category: category,
+            name,
+            description,
+            category,
             available: available === 'true',
-            itemInfo: itemInfo,
+            itemInfo,
             price: Number(price),
-            menuId: menuId,
+            menuId,
             image: imagePath
-        })
+        });
 
         return res.status(201).json({ message: 'Menu item created successfully.' });
     } catch (error) {
-        console.log(error); 
+        console.error(error);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
 
 ownerController.getMenuItemById = async function (req, res) {
     try {

@@ -114,8 +114,7 @@
 
         // Enviar dados para o servidor
         this.userService.updateProfile(profileData).subscribe({
-          next: (response) => {
-            console.log('Perfil atualizado com sucesso', response);
+          next: () => {
             this.router.navigate(['/profile']);
           },
           error: (error) => {

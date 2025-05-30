@@ -53,7 +53,7 @@ export class AuthService {
 
   changePassword(currentPassword: string, newPassword: string, confirmPassword: string): Observable<any> {
     const body = { currentPassword, newPassword, confirmPassword };
-    return this.http.post(`${environment.url}/profile/change-password`, body);
+    return this.http.put(`${environment.url}/profile/password`, body);
   }
 
 }

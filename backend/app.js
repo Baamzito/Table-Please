@@ -4,6 +4,8 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpecs = require('./lib/swagger');
 require('dotenv').config();
 
 const indexRouter = require('./routes/index');
@@ -13,6 +15,7 @@ const profileRouter = require('./routes/profileRoutes');
 const adminRouter = require('./routes/adminRoutes');
 const ownerRouter = require('./routes/ownerRoutes');
 const cartRouter = require('./routes/cartRoutes');
+const orderRouter = require('./routes/orderRoutes')
 
 const app = express();
 
@@ -55,6 +58,8 @@ app.use('/profile', profileRouter);
 app.use('/admin', adminRouter);
 app.use('/owner', ownerRouter);
 app.use('/cart', cartRouter);
+app.use('/order', orderRouter);
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

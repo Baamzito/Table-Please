@@ -18,6 +18,11 @@ import { OwnerMenuItemsComponent } from './components/owner/owner-menu-items/own
 import { OwnerCreateMenuItemsComponent } from './components/owner/owner-create-menu-items/owner-create-menu-items.component';
 import { OwnerEditMenuItemsComponent } from './components/owner/owner-edit-menu-items/owner-edit-menu-items.component';
 import { CartComponent } from './components/cart/cart.component';
+import { CheckoutComponent } from './components/checkout/checkout.component';
+import { OrderDetailsComponent } from './components/order-details/order-details.component';
+import { OrderHistoryComponent } from './components/order-history/order-history.component';
+import { OwnerManageOrdersComponent } from './components/owner/owner-manage-orders/owner-manage-orders.component';
+import { AdminDashboardComponent } from './components/admin/admin-dashboard/admin-dashboard.component';
 
 
 export const routes: Routes = [
@@ -36,6 +41,7 @@ export const routes: Routes = [
         { path: '', component: ProfileComponent },
         { path: 'edit', component: EditProfileComponent },
         { path: 'change-password', component: ChangePasswordComponent },
+        { path: 'orders', component: OrderHistoryComponent}
       ]
     },
     //Dono do restaurante
@@ -46,6 +52,7 @@ export const routes: Routes = [
         { path: 'restaurants', component: OwnerRestaurantsComponent },
         { path: 'restaurants/create', component: OwnerCreateRestaurantComponent },
         { path: 'restaurants/:id', component: OwnerEditRestaurantComponent },
+        { path: 'restaurants/:id/orders', component: OwnerManageOrdersComponent },
         { path: 'restaurants/:id/menus', component: OwnerMenusComponent},
         { path: 'restaurants/:id/menus/create', component: OwnerCreateMenuComponent},
         { path: 'restaurants/:id/menus/:menuId/edit', component: OwnerEditMenuComponent},
@@ -54,5 +61,17 @@ export const routes: Routes = [
         { path: 'restaurants/:id/menus/:menuId/items/:itemId/edit', component: OwnerEditMenuItemsComponent}
       ]
     },
-    { path: 'cart', canActivate: [authGuard], component: CartComponent}
+    //Carrinho
+    { path: 'cart', canActivate: [authGuard], component: CartComponent},
+    //Checkout
+    { path: 'checkout', canActivate: [authGuard], component: CheckoutComponent},
+    //Páginas das encomendas
+    {
+      path: 'order',
+      canActivate: [authGuard],
+      children: [
+        { path: ':id', component: OrderDetailsComponent },
+      ]
+    },
+    {path: 'admin/dashboard', canActivate: [authGuard], component: AdminDashboardComponent}
 ];

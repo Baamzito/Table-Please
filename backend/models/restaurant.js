@@ -15,7 +15,11 @@ const restaurantSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    }
+    },
+    settings: {
+        preparationTime: { type: Number, default: 30 },
+        deliveryTime: { type: Number, default: 20 },
+    }, 
 },{ timestamps: true });
 
 

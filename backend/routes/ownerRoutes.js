@@ -21,9 +21,9 @@ router.delete('/restaurants/:restaurantId/menus/:menuId', authToken, authorizedR
 
 // Gestão dos Itens dos Menus
 router.get('/restaurants/:restaurantId/menus/:menuId/items', authToken, authorizedRole('restaurant'), ownerController.getMenuItemsByMenu); //Devolve os menuitems referentes ao menu
-router.post('/restaurants/:restaurantId/menus/:menuId/items', authToken, authorizedRole('restaurant'), upload.single('image'), ownerController.createMenuItem);
-router.get('/restaurants/:restaurantId/menus/:menuId/items/:itemId', authToken, authorizedRole('restaurant'), ownerController.getMenuItemById);
-router.put('/restaurants/:restaurantId/menus/:menuId/items/:itemId', authToken, authorizedRole('restaurant'), upload.single('image'), ownerController.updateMenuItem);
-router.delete('/restaurants/:restaurantId/menus/:menuId/items/:itemId', authToken, authorizedRole('restaurant'), ownerController.deleteMenuItem);
+router.post('/restaurants/:restaurantId/menus/:menuId/items', authToken, authorizedRole('restaurant'), upload.single('image'), ownerController.createMenuItem); //Cria um menuItem associando-o ao menu
+router.get('/restaurants/:restaurantId/menus/:menuId/items/:itemId', authToken, authorizedRole('restaurant'), ownerController.getMenuItemById); //Devolve o menuItem pelo ID
+router.put('/restaurants/:restaurantId/menus/:menuId/items/:itemId', authToken, authorizedRole('restaurant'), upload.single('image'), ownerController.updateMenuItem); //Atualiza o menuItem
+router.delete('/restaurants/:restaurantId/menus/:menuId/items/:itemId', authToken, authorizedRole('restaurant'), ownerController.deleteMenuItem); //Remove um menuItem
 
 module.exports = router;

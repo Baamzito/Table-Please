@@ -36,6 +36,10 @@ export class OwnerEditRestaurantComponent {
       contact: this.formBuilder.group({
         phone: ['', [Validators.required, Validators.pattern(/^9[0-9]{8}$/)]],
         email: ['', [Validators.required, Validators.email]]
+      }),
+      settings: this.formBuilder.group({
+        preparationTime: [30, [Validators.required, Validators.min(1)]],
+        deliveryTime: [20, [Validators.required, Validators.min(1)]],
       })
     });
   }
@@ -64,6 +68,10 @@ export class OwnerEditRestaurantComponent {
       contact: {
         phone: restaurant.contact.phone,
         email: restaurant.contact.email || ''
+      },
+      settings: {
+        preparationTime: restaurant.settings?.preparationTime || 30,
+        deliveryTime: restaurant.settings?.deliveryTime || 20
       }
     });
   }
@@ -78,7 +86,9 @@ export class OwnerEditRestaurantComponent {
         address_city: this.restaurantForm.get('address.city')?.value,
         address_postcode: this.restaurantForm.get('address.postcode')?.value,
         contact_phone: this.restaurantForm.get('contact.phone')?.value,
-        contact_email: this.restaurantForm.get('contact.email')?.value
+        contact_email: this.restaurantForm.get('contact.email')?.value,
+        settings_preparationTime: this.restaurantForm.get('settings.preparationTime')?.value,
+        settings_deliveryTime: this.restaurantForm.get('settings.deliveryTime')?.value
       };
 
       this.restaurantService.updateRestaurant(this.restaurantId, restaurantData).subscribe({
@@ -116,11 +126,12 @@ export class OwnerEditRestaurantComponent {
     this.router.navigate(['/owner/restaurants']);
   }
 
-  // Getters para facilitar acesso aos controles no template
   get name() { return this.restaurantForm.get('name'); }
   get street() { return this.restaurantForm.get('address.street'); }
   get city() { return this.restaurantForm.get('address.city'); }
   get postcode() { return this.restaurantForm.get('address.postcode'); }
   get phone() { return this.restaurantForm.get('contact.phone'); }
   get email() { return this.restaurantForm.get('contact.email'); }
+  get preparationTime() { return this.restaurantForm.get('settings.preparationTime'); }
+  get deliveryTime() { return this.restaurantForm.get('settings.deliveryTime'); }
 }

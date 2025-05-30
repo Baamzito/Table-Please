@@ -1,0 +1,116 @@
+<div class="container mt-5 pt-5" style="min-height: calc(100vh - 100px)">
+  <div class="row">
+    <div class="col-lg-3 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-center mb-3">
+            <img
+              [src]="user.profileImage || '/assets/images/default-avatar.jpg'"
+              alt="Profile Picture"
+              class="img-fluid rounded-circle profile-image mb-3"
+              style="width: 120px; height: 120px; object-fit: cover"
+            />
+            <h5 class="mb-0">{{ user.firstName + ' ' + user.lastName }}</h5>
+            <p class="text-muted small">{{'@' + user.username }}</p>
+            <p class="text-muted small" *ngIf="user.address && (user.address.city || user.address.street)">
+              <i class="fas fa-map-marker-alt me-1"></i>
+              {{ user.address?.city || '' }}
+            </p>
+            <p class="text-muted small" *ngIf="!(user.address && (user.address.city || user.address.street))">
+              <i class="fas fa-map-marker-alt me-1"></i>Location not set
+            </p>
+            <div class="d-grid">
+              <a routerLink="/profile/edit" class="btn btn-outline-primary">
+                <i class="fas fa-user-edit me-2"></i>Edit Profile
+              </a>
+            </div>
+          </div>
+
+          <hr />
+
+          <div class="profile-menu">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" routerLink="/profile">
+                  <i class="fas fa-user me-2"></i>My Profile
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" routerLink="/profile/change-password">
+                  <i class="fas fa-lock me-2"></i>Change Password
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" routerLink="/profile/orders">
+                  <i class="fas fa-box me-2"></i>Order History
+                </a>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link text-danger" (click)="logout()">
+                  <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-9">
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+      </div>
+
+      <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <h4 class="mb-0">Order History</h4>
+        </div>
+        <div class="card-body p-4">
+          <div *ngIf="orders.length === 0" class="alert alert-info">
+            You have no orders yet.
+          </div>
+
+          <div class="table-responsive" *ngIf="orders.length > 0">
+            <table class="table table-hover align-middle text-nowrap">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Items</th>
+                  <th scope="col">Total</th>
+                  <th scope="col">Type</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let order of orders">
+                  <td>{{ order.createdAt | date: 'short' }}</td>
+                  <td>
+                    <ul class="list-unstyled mb-0">
+                      <li *ngFor="let item of order.items">
+                        <i class="fas fa-utensils me-1 text-muted"></i>
+                        {{ item.menuItem.name }} × <strong>{{ item.quantity }}</strong>
+                      </li>
+                    </ul>
+                  </td>
+                  <td class="fw-semibold text-primary">${{ order.totalPrice | number:'1.2-2' }}</td>
+                  <td class="text-capitalize">{{ order.type }}</td>
+                  <td>
+                    <span class="badge bg-secondary text-capitalize">{{ order.deliveryStatus }}</span>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary" (click)="viewOrder(order._id)">
+                      <i class="fas fa-eye me-1"></i> View
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

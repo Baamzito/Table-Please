@@ -4,20 +4,6 @@ const bcrypt = require('bcrypt')
 
 let authController = {}
 
-authController.showSignup = function(req, res){
-    if (req.user) {
-        return res.redirect('/');
-    }
-    res.render('auth/signup', {title: 'Sign up'})
-}
-
-authController.showLogin = function(req, res){
-    if (req.user) {
-        return res.redirect('/');
-    }
-    res.render('auth/login', {title: 'Login'})
-}
-
 authController.signup = async function(req, res){
     const { username, password, email, role, firstName, lastName, street, city, postalCode } = req.body;
 

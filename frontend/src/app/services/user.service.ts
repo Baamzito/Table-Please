@@ -17,7 +17,7 @@ export class UserService {
   }
 
   updateProfile(profileData: any): Observable<any> {
-    return this.http.post<any>(`${environment.url}/profile/update`, profileData);
+    return this.http.put<any>(`${environment.url}/profile`, profileData);
   }
 
 }

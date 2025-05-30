@@ -1,0 +1,58 @@
+<section class="pt-5 mt-5 bg-light min-vh-100">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow border-0 mb-4">
+          <div class="card-body p-4">
+            <h2 class="mb-4">Order Details</h2>
+
+            <div *ngIf="loading" class="text-center py-5">
+              <div class="spinner-border text-primary" role="status"></div>
+            </div>
+
+            <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+            <div *ngIf="order">
+              <p><strong>Order ID:</strong> {{ order._id }}</p>
+              <p><strong>Status:</strong> {{ order.deliveryStatus }}</p>
+              <p><strong>Payment:</strong> {{ order.paymentStatus }}</p>
+              <p><strong>Type:</strong> {{ order.type }}</p>
+              <p><strong>Payment Method:</strong> {{ order.paymentMethod }}</p>
+              <p><strong>Contact:</strong> {{ order.contact }}</p>
+              <p><strong>Citizen Card Number:</strong> {{ order.citizenCardNumber }}</p>
+              <p><strong>Delivery Address:</strong>
+                {{ order.deliveryDetails.address }},
+                {{ order.deliveryDetails.city }},
+                {{ order.deliveryDetails.postalCode }}
+              </p>
+
+              <div *ngIf="canCancel(order)" class="alert alert-warning d-flex justify-content-between align-items-center">
+                <span>You can cancel this order for the next <strong>{{ countdown }}</strong></span>
+                <button class="btn btn-outline-danger btn-sm" (click)="cancelOrder()" [disabled]="cancelling">
+                  {{ cancelling ? 'Cancelling...' : 'Cancel Order' }}
+                </button>
+              </div>
+
+              <hr>
+
+              <h5>Items:</h5>
+              <ul class="list-group mb-3">
+                <li *ngFor="let item of order.items" class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>{{ item.menuItem.name }}</strong><br>
+                    <small class="text-muted">Qty: {{ item.quantity }}</small>
+                  </div>
+                  <span class="fw-bold text-end">${{ (item.quantity * item.price) | number: '1.2-2' }}</span>
+                </li>
+              </ul>
+              <div class="text-end">
+                <h5>Total: <span class="text-primary">${{ order.totalPrice | number: '1.2-2' }}</span></h5>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

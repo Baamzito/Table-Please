@@ -14,16 +14,15 @@
             </button>
           </div>
         </div>
-        
+
         <div class="card-body">
-          
           <!-- Error Alert -->
           <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
             {{ errorMessage }}
           </div>
-          
+
           <form [formGroup]="restaurantForm" (ngSubmit)="onSubmit()">
-            
+
             <!-- Restaurant Name -->
             <div class="mb-3">
               <label for="name" class="form-label">Restaurant Name *</label>
@@ -38,14 +37,13 @@
                 <span *ngIf="name?.errors?.['minlength']">Restaurant name must be at least 2 characters</span>
               </div>
             </div>
-            
+
             <!-- Address Section -->
             <div class="card mb-3" formGroupName="address">
               <div class="card-header bg-light">
                 <h5 class="mb-0">Address</h5>
               </div>
               <div class="card-body">
-                
                 <div class="mb-3">
                   <label for="street" class="form-label">Street *</label>
                   <input 
@@ -58,7 +56,7 @@
                     Street address is required
                   </div>
                 </div>
-                
+
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label for="city" class="form-label">City *</label>
@@ -72,7 +70,7 @@
                       City is required
                     </div>
                   </div>
-                  
+
                   <div class="col-md-6 mb-3">
                     <label for="postcode" class="form-label">Postal Code *</label>
                     <input 
@@ -91,7 +89,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Contact Section -->
             <div class="card mb-3" formGroupName="contact">
               <div class="card-header bg-light">
@@ -114,7 +112,7 @@
                       <span *ngIf="phone?.errors?.['pattern']">Phone must start with 9 and have 9 digits</span>
                     </div>
                   </div>
-                  
+
                   <div class="col-md-6 mb-3">
                     <label for="email" class="form-label">Email Address *</label>
                     <input 
@@ -131,7 +129,41 @@
                 </div>
               </div>
             </div>
-            
+
+            <!-- Delivery Settings -->
+            <div class="card mb-3" formGroupName="settings">
+              <div class="card-header bg-light">
+                <h5 class="mb-0">Delivery Settings</h5>
+              </div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <label for="preparationTime" class="form-label">Preparation Time (min) *</label>
+                  <input 
+                    type="number" 
+                    class="form-control"
+                    [class.is-invalid]="preparationTime?.invalid && preparationTime?.touched"
+                    id="preparationTime" 
+                    formControlName="preparationTime">
+                  <div *ngIf="preparationTime?.invalid && preparationTime?.touched" class="invalid-feedback">
+                    Preparation time is required and must be a number
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="deliveryTime" class="form-label">Delivery Time (min) *</label>
+                  <input 
+                    type="number" 
+                    class="form-control"
+                    [class.is-invalid]="deliveryTime?.invalid && deliveryTime?.touched"
+                    id="deliveryTime" 
+                    formControlName="deliveryTime">
+                  <div *ngIf="deliveryTime?.invalid && deliveryTime?.touched" class="invalid-feedback">
+                    Delivery time is required and must be a number
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Form Actions -->
             <div class="d-flex justify-content-between mt-4">
               <button 
