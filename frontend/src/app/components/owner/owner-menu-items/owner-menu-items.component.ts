@@ -17,8 +17,6 @@ export class OwnerMenuItemsComponent {
   menuItems: any[] = [];
   loading = true;
   errorMessage: string | null = null;
-  
-  // Delete modal state
   showDeleteModal = false;
   itemToDelete: any | null = null;
   isDeleting = false;
@@ -93,7 +91,6 @@ export class OwnerMenuItemsComponent {
   openDeleteModal(item: any): void {
     this.itemToDelete = item;
     this.showDeleteModal = true;
-    // Prevent body scroll
     document.body.classList.add('modal-open');
   }
 

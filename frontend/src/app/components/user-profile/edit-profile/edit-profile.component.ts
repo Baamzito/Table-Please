@@ -67,13 +67,11 @@
     onFileSelected(event: any): void {
       const file = event.target.files[0];
       if (file) {
-        // Validar tamanho do arquivo (5MB max)
         if (file.size > 5 * 1024 * 1024) {
           this.error = 'O arquivo deve ter no máximo 5MB';
           return;
         }
 
-        // Validar tipo do arquivo
         if (!file.type.startsWith('image/')) {
           this.error = 'Por favor selecione apenas arquivos de imagem';
           return;
@@ -81,7 +79,6 @@
 
         this.selectedFile = file;
         
-        // Criar preview da imagem
         const reader = new FileReader();
         reader.onload = (e) => {
           this.previewImageSrc = e.target?.result as string;
@@ -101,7 +98,6 @@
 
     onSubmit(): void {
       if (this.profileForm.valid) {
-        // Preparar dados do formulário
         const profileData = {
           firstName: this.profileForm.value.firstName,
           lastName: this.profileForm.value.lastName,
@@ -112,7 +108,6 @@
           address_postalCode: this.profileForm.value.postalCode || ''
         };
 
-        // Enviar dados para o servidor
         this.userService.updateProfile(profileData).subscribe({
           next: () => {
             this.router.navigate(['/profile']);

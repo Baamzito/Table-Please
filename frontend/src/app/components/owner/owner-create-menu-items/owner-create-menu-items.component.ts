@@ -63,12 +63,10 @@ export class OwnerCreateMenuItemsComponent implements OnInit{
       return;
     }
 
-    // Load menu
     this.menuService.getMenuById(restaurantId, menuId).subscribe({
       next: (response) => {
         this.menu = response.menu;
         
-        // Load restaurant
         this.restaurantService.getRestaurantById(restaurantId).subscribe({
           next: (response) => {
             this.restaurant = response.restaurant;
@@ -108,7 +106,6 @@ export class OwnerCreateMenuItemsComponent implements OnInit{
     const formData = new FormData();
     const formValue = this.itemForm.value;
 
-    // Append form fields
     formData.append('name', formValue.name);
     formData.append('description', formValue.description);
     formData.append('price', formValue.price.toString());
@@ -116,7 +113,6 @@ export class OwnerCreateMenuItemsComponent implements OnInit{
     formData.append('available', formValue.available.toString());
     formData.append('menuId', this.menu._id);
     
-    // Append nutritional info
     formData.append('itemInfo_calories', formValue.itemInfo.calories.toString());
     formData.append('itemInfo_proteins', formValue.itemInfo.proteins.toString());
     formData.append('itemInfo_fats', formValue.itemInfo.fats.toString());
@@ -124,7 +120,6 @@ export class OwnerCreateMenuItemsComponent implements OnInit{
     formData.append('itemInfo_fiber', formValue.itemInfo.fiber.toString());
     formData.append('itemInfo_sodium', formValue.itemInfo.sodium.toString());
     
-    // Append image
     formData.append('image', this.selectedFile);
 
     this.menuItemService.createMenuItem(this.restaurant._id, this.menu._id,  formData).subscribe({

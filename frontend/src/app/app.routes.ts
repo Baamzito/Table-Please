@@ -23,6 +23,7 @@ import { OrderDetailsComponent } from './components/order-details/order-details.
 import { OrderHistoryComponent } from './components/order-history/order-history.component';
 import { OwnerManageOrdersComponent } from './components/owner/owner-manage-orders/owner-manage-orders.component';
 import { AdminDashboardComponent } from './components/admin/admin-dashboard/admin-dashboard.component';
+import { roleGuard } from './guards/role.guard';
 
 
 export const routes: Routes = [
@@ -47,7 +48,8 @@ export const routes: Routes = [
     //Dono do restaurante
     {
       path: 'owner',
-      canActivate: [authGuard],
+      canActivate: [authGuard, roleGuard],
+      data: { roles: ['restaurant'] },
       children: [
         { path: 'restaurants', component: OwnerRestaurantsComponent },
         { path: 'restaurants/create', component: OwnerCreateRestaurantComponent },
@@ -62,16 +64,17 @@ export const routes: Routes = [
       ]
     },
     //Carrinho
-    { path: 'cart', canActivate: [authGuard], component: CartComponent},
+    { path: 'cart', canActivate: [authGuard, roleGuard], data: { roles: ['customer'] }, component: CartComponent},
     //Checkout
-    { path: 'checkout', canActivate: [authGuard], component: CheckoutComponent},
+    { path: 'checkout', canActivate: [authGuard, roleGuard], data: { roles: ['customer'] }, component: CheckoutComponent},
     //Páginas das encomendas
     {
       path: 'order',
-      canActivate: [authGuard],
+      canActivate: [authGuard, roleGuard],
+      data: { roles: ['customer', 'restaurant'] },
       children: [
         { path: ':id', component: OrderDetailsComponent },
       ]
     },
-    {path: 'admin/dashboard', canActivate: [authGuard], component: AdminDashboardComponent}
+    {path: 'admin/dashboard', canActivate: [authGuard, roleGuard], data: { roles: ['admin'] }, component: AdminDashboardComponent}
 ];

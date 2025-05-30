@@ -51,6 +51,13 @@ export class AuthService {
     }
   }
 
+  hasRole(roles: string[]) : boolean {
+    const user = this.getUser();
+    if (!user || !user.role) return false;
+    
+    return roles.includes(user.role);
+  }
+
   changePassword(currentPassword: string, newPassword: string, confirmPassword: string): Observable<any> {
     const body = { currentPassword, newPassword, confirmPassword };
     return this.http.put(`${environment.url}/profile/password`, body);

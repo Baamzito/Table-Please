@@ -18,6 +18,10 @@ const options = {
         description: "Funcionalidades de administração e controlo do sistema",
       },
       {
+        name: "Restaurant - Public",
+        description: "Pesquisa e visualização dos restaurantes",
+      },
+      {
         name: "Restaurant",
         description: "Criação e edição de perfis de restaurantes",
       },
@@ -1030,7 +1034,65 @@ const options = {
             500: { description: 'Erro ao remover restaurante' }
           }
         }
-      }
+      },
+      '/restaurants': {
+        get: {
+          tags: ['Restaurant - Public'],
+          summary: 'Obter todos os restaurantes',
+          responses: {
+            200: { description: 'Lista de restaurantes' },
+            500: { description: 'Erro interno do servidor' }
+          }
+        }
+      },
+
+      '/restaurants/search': {
+        get: {
+          tags: ['Restaurant - Public'],
+          summary: 'Pesquisar restaurantes por nome e/ou cidade',
+          parameters: [
+            {
+              name: 'name',
+              in: 'query',
+              schema: { type: 'string' },
+              required: false,
+              description: 'Nome parcial ou completo do restaurante'
+            },
+            {
+              name: 'city',
+              in: 'query',
+              schema: { type: 'string' },
+              required: false,
+              description: 'Nome da cidade onde se localiza o restaurante'
+            }
+          ],
+          responses: {
+            200: { description: 'Lista de restaurantes que correspondem aos critérios' },
+            500: { description: 'Erro interno do servidor' }
+          }
+        }
+      },
+
+      '/restaurants/{id}': {
+        get: {
+          tags: ['Restaurant - Public'],
+          summary: 'Obter detalhes de um restaurante específico e os seus menus ativos',
+          parameters: [
+            {
+              name: 'id',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+              description: 'ID do restaurante'
+            }
+          ],
+          responses: {
+            200: { description: 'Restaurante encontrado com menus e itens' },
+            404: { description: 'Restaurante não encontrado' },
+            500: { description: 'Erro interno do servidor' }
+          }
+        }
+      },
     },
   },
 

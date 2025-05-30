@@ -21,7 +21,7 @@ export class OwnerEditMenuItemsComponent {
   isSubmitting = false;
   errorMessage: string | null = null;
   selectedFile: File | null = null;
-  isImageRequired = false; // For edit, image is optional
+  isImageRequired = false;
 
   constructor(
     private fb: FormBuilder,
@@ -66,19 +66,16 @@ export class OwnerEditMenuItemsComponent {
       return;
     }
 
-    // Load menu item first
     this.menuItemService.getMenuItemById(restaurantId, menuId, itemId).subscribe({
       next: (response) => {
         this.menuItem = response.menuItem;
         console.log(this.menuItem)
         this.populateForm();
         
-        // Load menu
         this.menuService.getMenuById(restaurantId, menuId).subscribe({
           next: (response) => {
             this.menu = response.menu;
             
-            // Load restaurant
             this.restaurantService.getRestaurantById(restaurantId).subscribe({
               next: (response) => {
                 this.restaurant = response.restaurant;
@@ -145,7 +142,6 @@ export class OwnerEditMenuItemsComponent {
     const formData = new FormData();
     const formValue = this.itemForm.value;
 
-    // Append form fields
     formData.append('name', formValue.name);
     formData.append('description', formValue.description);
     formData.append('price', formValue.price.toString());
@@ -153,7 +149,6 @@ export class OwnerEditMenuItemsComponent {
     formData.append('available', formValue.available.toString());
     formData.append('menuId', this.menu._id);
     
-    // Append nutritional info
     formData.append('itemInfo_calories', formValue.itemInfo.calories.toString());
     formData.append('itemInfo_proteins', formValue.itemInfo.proteins.toString());
     formData.append('itemInfo_fats', formValue.itemInfo.fats.toString());
@@ -161,7 +156,6 @@ export class OwnerEditMenuItemsComponent {
     formData.append('itemInfo_fiber', formValue.itemInfo.fiber.toString());
     formData.append('itemInfo_sodium', formValue.itemInfo.sodium.toString());
     
-    // Append image if selected
     if (this.selectedFile) {
       formData.append('image', this.selectedFile);
     }
